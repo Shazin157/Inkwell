@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Inkwell</string>
+    <string name="kindle_edition">Inkwell Edition</string>
+    <string name="search_hint">Search books by title or author…</string>
+    <string name="upload_book">Import Book</string>
+    <string name="empty_library_title">Your Library is Empty</string>
+    <string name="empty_library_desc">Import your favourite EPUB, PDF, or TXT books to start reading with custom typography and display themes.</string>
+    <string name="load_starter_books">Load Starter Classics</string>
+    <string name="display_settings">Display &amp; Style</string>
+    <string name="keep_screen_awake">Keep Screen Awake</string>
+    <string name="night_dimmer">Night Brightness Dimmer</string>
+    <string name="filter_all">All</string>
+    <string name="filter_reading">In Progress</string>
+    <string name="filter_epub">EPUB</string>
+    <string name="filter_pdf">PDF</string>
+    <string name="filter_txt">Text</string>
+</resources>

@@ -1,0 +1,19 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base Application Theme -->
+    <style name="Theme.LuminaReader" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/amber_500</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorSecondary">@color/amber_400</item>
+        <item name="android:statusBarColor">@color/app_bg</item>
+        <item name="android:navigationBarColor">@color/app_bg</item>
+        <item name="android:windowBackground">@color/app_bg</item>
+    </style>
+
+    <!-- Fullscreen Reader Theme -->
+    <style name="Theme.LuminaReader.Fullscreen" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/amber_500</item>
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:navigationBarColor">@color/black</item>
+        <item name="android:windowBackground">@color/black</item>
+    </style>
+</resources>

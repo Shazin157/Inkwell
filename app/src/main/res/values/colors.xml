@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand & Accent -->
+    <color name="amber_400">#FBBF24</color>
+    <color name="amber_500">#F59E0B</color>
+    <color name="amber_600">#D97706</color>
+
+    <!-- Dark App Theme Base -->
+    <color name="app_bg">#0F1115</color>
+    <color name="app_surface">#171A21</color>
+    <color name="app_surface_variant">#1E222C</color>
+    <color name="app_border">#282D37</color>
+    <color name="text_primary">#F1F5F9</color>
+    <color name="text_secondary">#94A3B8</color>
+    <color name="text_tertiary">#64748B</color>
+
+    <!-- Reader Paper Themes -->
+    <!-- Light Paper -->
+    <color name="reader_light_bg">#FDFDFD</color>
+    <color name="reader_light_text">#1B1C1E</color>
+    <color name="reader_light_bar">#F8F9FA</color>
+    <color name="reader_light_border">#E2E8F0</color>
+
+    <!-- Warm Sepia -->
+    <color name="reader_sepia_bg">#F5EEDC</color>
+    <color name="reader_sepia_text">#2F2519</color>
+    <color name="reader_sepia_bar">#EDE3CD</color>
+    <color name="reader_sepia_border">#E4D7BF</color>
+
+    <!-- Sand Parchment -->
+    <color name="reader_sand_bg">#EBE5D8</color>
+    <color name="reader_sand_text">#252422</color>
+    <color name="reader_sand_bar">#E1D9C9</color>
+    <color name="reader_sand_border">#D7CEBF</color>
+
+    <!-- Charcoal Dark -->
+    <color name="reader_charcoal_bg">#1E2025</color>
+    <color name="reader_charcoal_text">#E2E5EB</color>
+    <color name="reader_charcoal_bar">#17191D</color>
+    <color name="reader_charcoal_border">#2E323B</color>
+
+    <!-- Pure OLED Black -->
+    <color name="reader_oled_bg">#000000</color>
+    <color name="reader_oled_text">#D4D4D8</color>
+    <color name="reader_oled_bar">#0A0A0C</color>
+    <color name="reader_oled_border">#27272A</color>
+
+    <!-- Emerald Mint -->
+    <color name="reader_emerald_bg">#0D1A16</color>
+    <color name="reader_emerald_text">#D1FAE5</color>
+    <color name="reader_emerald_bar">#091410</color>
+    <color name="reader_emerald_border">#16382E</color>
+
+    <!-- Format Badges -->
+    <color name="badge_epub_bg">#33F59E0B</color>
+    <color name="badge_epub_text">#FBBF24</color>
+    <color name="badge_pdf_bg">#33F43F5E</color>
+    <color name="badge_pdf_text">#FB7185</color>
+    <color name="badge_txt_bg">#330EA5E9</color>
+    <color name="badge_txt_text">#38BDF8</color>
+
+    <!-- Common -->
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="transparent">#00000000</color>
+</resources>

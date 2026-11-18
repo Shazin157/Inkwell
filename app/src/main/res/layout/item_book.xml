@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="6dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardBackgroundColor="@color/app_surface"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/app_border"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Cover Container -->
+        <FrameLayout
+            android:id="@+id/layoutCover"
+            android:layout_width="match_parent"
+            android:layout_height="190dp">
+
+            <!-- Cover Image (if present) -->
+            <ImageView
+                android:id="@+id/ivCoverImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
+            <!-- Fallback Typographic Cover -->
+            <LinearLayout
+                android:id="@+id/layoutTypoCover"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tvTypoTag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.6"
+                    android:letterSpacing="0.1"
+                    android:text="INKWELL EDITION"
+                    android:textColor="@color/white"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvTypoTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="3"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="2dp"
+                    android:layout_marginVertical="8dp"
+                    android:background="@color/amber_400" />
+
+                <TextView
+                    android:id="@+id/tvTypoAuthor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.8"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:textColor="@color/white"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- Format Badge Top-Right -->
+            <TextView
+                android:id="@+id/tvFormatBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="8dp"
+                android:background="@drawable/bg_badge_kindle"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:text="EPUB"
+                android:textColor="@color/amber_400"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+
+            <!-- Reading Progress Bar at Bottom of Cover -->
+            <ProgressBar
+                android:id="@+id/pbReadingCover"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_gravity="bottom"
+                android:progressDrawable="@drawable/bg_progress_amber" />
+        </FrameLayout>
+
+        <!-- Meta info below cover -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/tvBookTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/text_primary"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvBookAuthor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp" />
+
+            <!-- Bottom row: % and more options -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvProgressPercent"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="0% read"
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="11sp" />
+
+                <ImageView
+                    android:id="@+id/ivBookMenu"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="3dp"
+                    android:src="@drawable/ic_more"
+                    app:tint="@color/text_secondary" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
