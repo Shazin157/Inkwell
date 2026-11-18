@@ -19,12 +19,11 @@
             android:layout_height="match_parent"
             android:visibility="gone" />
 
-        <!-- PDF Page Image View -->
-        <ImageView
+        <!-- PDF Page View with Smooth Pan, Pinch Zoom, and Fit Width -->
+        <com.lumina.reader.ui.view.ZoomablePdfView
             android:id="@+id/ivPdfPage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitCenter"
             android:visibility="gone" />
 
         <!-- Plain Text Scroll View -->

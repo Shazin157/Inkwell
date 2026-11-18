@@ -144,18 +144,25 @@ class ReaderActivity : AppCompatActivity() {
             }
         })
 
-        // Single tap gesture detector for PDF & Plain Text
+        // PDF tap & swipe gestures
+        binding.ivPdfPage.onSingleTapListener = {
+            toggleChrome()
+        }
+        binding.ivPdfPage.onPageSwipeListener = { direction ->
+            if (direction > 0) {
+                navigateNext()
+            } else {
+                navigatePrevious()
+            }
+        }
+
+        // Single tap gesture detector for Plain Text
         val singleTapDetector = android.view.GestureDetector(this, object : android.view.GestureDetector.SimpleOnGestureListener() {
             override fun onSingleTapConfirmed(e: android.view.MotionEvent): Boolean {
                 toggleChrome()
                 return true
             }
         })
-
-        binding.ivPdfPage.setOnTouchListener { _, event ->
-            singleTapDetector.onTouchEvent(event)
-            true
-        }
 
         binding.svTextContent.setOnTouchListener { _, event ->
             singleTapDetector.onTouchEvent(event)
@@ -485,11 +492,17 @@ class ReaderActivity : AppCompatActivity() {
 
         try {
             val page = renderer.openPage(pageIndex)
-            val bitmap = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
+            val displayMetrics = resources.displayMetrics
+            val screenWidth = displayMetrics.widthPixels
+            // Scale up to crisp high-DPI resolution for phone display
+            val targetWidth = (screenWidth * 1.5f).toInt().coerceAtLeast(1080)
+            val aspectRatio = page.height.toFloat() / page.width.toFloat()
+            val targetHeight = (targetWidth * aspectRatio).toInt()
+            val bitmap = Bitmap.createBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888)
             page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
             page.close()
 
-            binding.ivPdfPage.setImageBitmap(bitmap)
+            binding.ivPdfPage.setPdfBitmap(bitmap)
 
             // Dark/Sepia theme filter for PDF
             when (displaySettings.theme) {
@@ -782,6 +795,39 @@ class ReaderActivity : AppCompatActivity() {
                 displaySettings.theme = theme
                 repository.saveDisplaySettings(displaySettings)
                 applyDisplaySettings()
+            }
+        }
+
+        // Mode Switching: PDF controls vs reflowable text controls
+        val isPdf = currentBook?.format == "pdf"
+        sBinding.layoutPdfControls.visibility = if (isPdf) View.VISIBLE else View.GONE
+        sBinding.layoutTextControls.visibility = if (isPdf) View.GONE else View.VISIBLE
+
+        if (isPdf) {
+            sBinding.btnPdfFitWidth.setOnClickListener {
+                binding.ivPdfPage.setFitWidthMode(true)
+                sBinding.btnPdfFitWidth.setTextColor(Color.parseColor("#F59E0B"))
+                sBinding.btnPdfFitPage.setTextColor(Color.WHITE)
+                Toast.makeText(this, "Fit Width enabled (no side gaps)", Toast.LENGTH_SHORT).show()
+            }
+
+            sBinding.btnPdfFitPage.setOnClickListener {
+                binding.ivPdfPage.setFitWidthMode(false)
+                sBinding.btnPdfFitPage.setTextColor(Color.parseColor("#F59E0B"))
+                sBinding.btnPdfFitWidth.setTextColor(Color.WHITE)
+                Toast.makeText(this, "Fit Entire Page enabled", Toast.LENGTH_SHORT).show()
+            }
+
+            sBinding.btnPdfZoomIn.setOnClickListener {
+                binding.ivPdfPage.zoomIn()
+            }
+
+            sBinding.btnPdfZoomOut.setOnClickListener {
+                binding.ivPdfPage.zoomOut()
+            }
+
+            sBinding.btnPdfZoomReset.setOnClickListener {
+                binding.ivPdfPage.resetZoom()
             }
         }
 
