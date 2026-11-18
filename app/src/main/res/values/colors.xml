@@ -15,6 +15,18 @@
     <color name="text_tertiary">#64748B</color>
 
     <!-- Reader Paper Themes -->
+    <!-- Kindle Paperwhite Carta (E-Ink) -->
+    <color name="reader_paperwhite_bg">#F7F4EB</color>
+    <color name="reader_paperwhite_text">#121316</color>
+    <color name="reader_paperwhite_bar">#EFECE2</color>
+    <color name="reader_paperwhite_border">#E3DFC7</color>
+
+    <!-- Kindle Paperwhite Warm Light -->
+    <color name="reader_warmlight_bg">#F5E8C7</color>
+    <color name="reader_warmlight_text">#1A1813</color>
+    <color name="reader_warmlight_bar">#ECE0BE</color>
+    <color name="reader_warmlight_border">#E2D4AF</color>
+
     <!-- Light Paper -->
     <color name="reader_light_bg">#FDFDFD</color>
     <color name="reader_light_text">#1B1C1E</color>

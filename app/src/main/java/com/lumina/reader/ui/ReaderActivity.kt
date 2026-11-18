@@ -182,6 +182,13 @@ class ReaderActivity : AppCompatActivity() {
         val dimmerAlpha = (displaySettings.dimmerPercent / 100f) * 0.85f
         binding.viewDimmerOverlay.alpha = dimmerAlpha
 
+        // Kindle E-Ink Paper Matte Grain Overlay
+        binding.viewPaperTexture.isPaperTextureEnabled = displaySettings.einkMatteOverlay
+
+        // Kindle Adjustable Warm Frontlight Overlay
+        val warmthAlpha = (displaySettings.einkWarmthPercent / 100f) * 0.32f
+        binding.viewWarmthOverlay.alpha = warmthAlpha
+
         // Theme colors
         val (bgColor, textColor, barColor) = getThemeColors(displaySettings.theme)
         binding.layoutReaderRoot.setBackgroundColor(Color.parseColor(bgColor))
@@ -196,15 +203,28 @@ class ReaderActivity : AppCompatActivity() {
         }
     }
 
+    private fun triggerEinkRefreshFlash() {
+        if (!displaySettings.einkPageRefreshFlash) return
+        binding.viewEinkFlash.visibility = View.VISIBLE
+        binding.viewEinkFlash.alpha = 0.85f
+        binding.viewEinkFlash.animate()
+            .alpha(0f)
+            .setDuration(90)
+            .withEndAction {
+                binding.viewEinkFlash.visibility = View.GONE
+            }
+            .start()
+    }
+
     private fun getThemeColors(theme: String): Triple<String, String, String> {
         return when (theme) {
-            "light" -> Triple("#FDFDFD", "#1B1C1E", "#FAF8F9FA")
-            "sepia" -> Triple("#F5EEDC", "#2F2519", "#FAEDE3CD")
-            "sand" -> Triple("#EBE5D8", "#252422", "#FAE1D9C9")
-            "charcoal" -> Triple("#1E2025", "#E2E5EB", "#FA17191D")
-            "oled" -> Triple("#000000", "#D4D4D8", "#FA0A0A0C")
-            "emerald" -> Triple("#0D1A16", "#D1FAE5", "#FA091410")
-            else -> Triple("#F5EEDC", "#2F2519", "#FAEDE3CD")
+            "paperwhite" -> Triple("#F7F4EB", "#121316", "#EFECE2")
+            "warm_light" -> Triple("#F5E8C7", "#1A1813", "#ECE0BE")
+            "sepia" -> Triple("#F5EEDC", "#2F2519", "#EDE3CD")
+            "sand" -> Triple("#EBE5D8", "#252422", "#E1D9C9")
+            "charcoal" -> Triple("#1A1B1E", "#E2E5EB", "#141518")
+            "oled" -> Triple("#000000", "#D4D4D8", "#0A0A0C")
+            else -> Triple("#F7F4EB", "#121316", "#EFECE2")
         }
     }
 
@@ -358,9 +378,9 @@ class ReaderActivity : AppCompatActivity() {
     private fun injectEpubStyles(html: String): String {
         val (bg, text, _) = getThemeColors(displaySettings.theme)
         val fontCss = when (displaySettings.fontFamily) {
-            "sans" -> "font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;"
-            "mono" -> "font-family: monospace;"
-            else -> "font-family: Georgia, serif;"
+            "sans" -> "font-family: -apple-system, BlinkMacSystemFont, 'Amazon Ember', 'Segoe UI', Roboto, sans-serif;"
+            "mono" -> "font-family: 'SF Mono', Consolas, Menlo, monospace;"
+            else -> "font-family: 'Bookerly', 'Georgia', 'Palatino', 'Times New Roman', serif;"
         }
 
         val styleTag = """
@@ -375,6 +395,9 @@ class ReaderActivity : AppCompatActivity() {
                     margin: 0 !important;
                     word-break: break-word !important;
                     box-sizing: border-box !important;
+                    text-rendering: optimizeLegibility !important;
+                    -webkit-font-smoothing: antialiased !important;
+                    letter-spacing: 0.015em !important;
                 }
                 p {
                     margin-bottom: 1em !important;
@@ -595,6 +618,7 @@ class ReaderActivity : AppCompatActivity() {
     // Navigation
     // ----------------------------------------------------
     private fun navigatePrevious() {
+        triggerEinkRefreshFlash()
         when (currentBook?.format) {
             "epub" -> {
                 if (currentSpineIndex > 0) {
@@ -615,6 +639,7 @@ class ReaderActivity : AppCompatActivity() {
     }
 
     private fun navigateNext() {
+        triggerEinkRefreshFlash()
         when (currentBook?.format) {
             "epub" -> {
                 val meta = epubMeta ?: return
@@ -636,6 +661,7 @@ class ReaderActivity : AppCompatActivity() {
     }
 
     private fun jumpToPercentage(percent: Int) {
+        triggerEinkRefreshFlash()
         when (currentBook?.format) {
             "epub" -> {
                 val meta = epubMeta ?: return
@@ -782,12 +808,12 @@ class ReaderActivity : AppCompatActivity() {
 
         // Setup theme buttons
         val themeButtons = listOf(
-            sBinding.btnThemeLight to "light",
+            sBinding.btnThemePaperwhite to "paperwhite",
+            sBinding.btnThemeWarmLight to "warm_light",
             sBinding.btnThemeSepia to "sepia",
             sBinding.btnThemeSand to "sand",
             sBinding.btnThemeCharcoal to "charcoal",
-            sBinding.btnThemeOled to "oled",
-            sBinding.btnThemeEmerald to "emerald"
+            sBinding.btnThemeOled to "oled"
         )
 
         themeButtons.forEach { (btn, theme) ->
@@ -796,6 +822,35 @@ class ReaderActivity : AppCompatActivity() {
                 repository.saveDisplaySettings(displaySettings)
                 applyDisplaySettings()
             }
+        }
+
+        // Kindle E-Ink & Paper Simulation Controls
+        sBinding.switchPaperMatte.isChecked = displaySettings.einkMatteOverlay
+        sBinding.switchPaperMatte.setOnCheckedChangeListener { _, isChecked ->
+            displaySettings.einkMatteOverlay = isChecked
+            repository.saveDisplaySettings(displaySettings)
+            applyDisplaySettings()
+        }
+
+        sBinding.tvWarmthPercent.text = "${displaySettings.einkWarmthPercent}%"
+        sBinding.sbScreenWarmth.progress = displaySettings.einkWarmthPercent
+        sBinding.sbScreenWarmth.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    displaySettings.einkWarmthPercent = progress
+                    sBinding.tvWarmthPercent.text = "$progress%"
+                    repository.saveDisplaySettings(displaySettings)
+                    applyDisplaySettings()
+                }
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        sBinding.switchEinkFlash.isChecked = displaySettings.einkPageRefreshFlash
+        sBinding.switchEinkFlash.setOnCheckedChangeListener { _, isChecked ->
+            displaySettings.einkPageRefreshFlash = isChecked
+            repository.saveDisplaySettings(displaySettings)
         }
 
         // Mode Switching: PDF controls vs reflowable text controls

@@ -46,6 +46,35 @@
                 android:textColor="@color/white"
                 android:textSize="18sp" />
         </ScrollView>
+
+        <!-- True E-Ink Paperwhite Tactile Fiber & Matte Grain Overlay -->
+        <com.lumina.reader.ui.view.PaperTextureOverlayView
+            android:id="@+id/viewPaperTexture"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="false"
+            android:focusable="false" />
+
+        <!-- Kindle Paperwhite Adjustable Warm Frontlight Overlay -->
+        <View
+            android:id="@+id/viewWarmthOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0"
+            android:background="#FF9E0D"
+            android:clickable="false"
+            android:focusable="false" />
+
+        <!-- Authentic E-Ink Electrophoretic Micro-Refresh Flash Screen -->
+        <View
+            android:id="@+id/viewEinkFlash"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0"
+            android:background="@color/black"
+            android:clickable="false"
+            android:focusable="false"
+            android:visibility="gone" />
     </FrameLayout>
 
     <!-- Software Dimmer Overlay for Midnight Reading (Adjustable alpha) -->

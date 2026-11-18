@@ -2,6 +2,7 @@ package com.lumina.reader.ui
 
 import android.content.Intent
 import android.net.Uri
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -21,6 +22,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -57,7 +63,23 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        updateGreeting()
         loadBooks()
+    }
+
+    private fun updateGreeting() {
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        val greetingTime = when (hour) {
+            in 5..11 -> "Good morning"
+            in 12..16 -> "Good afternoon"
+            in 17..22 -> "Good evening"
+            else -> "Good night"
+        }
+        val settings = repository.loadDisplaySettings()
+        binding.tvGreeting.text = "$greetingTime, ${settings.readerName}"
+
+        val sdf = SimpleDateFormat("EEEE, MMM d", Locale.getDefault())
+        binding.tvGreetingSubtitle.text = "${sdf.format(Date())} • Kindle Sanctuary"
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -95,6 +117,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
+        // Settings Button
+        binding.btnSettings.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
+
         // Upload FAB
         binding.fabUpload.setOnClickListener {
             openDocumentLauncher.launch(
@@ -177,6 +204,9 @@ class MainActivity : AppCompatActivity() {
 
         bookAdapter.updateBooks(filtered)
 
+        // Update Kindle "Jump Back In" Hero Card
+        updateHeroCard()
+
         // Empty state visibility
         if (allBooks.isEmpty()) {
             binding.layoutEmpty.visibility = View.VISIBLE
@@ -184,6 +214,44 @@ class MainActivity : AppCompatActivity() {
         } else {
             binding.layoutEmpty.visibility = View.GONE
             binding.rvBooks.visibility = View.VISIBLE
+        }
+    }
+
+    private fun updateHeroCard() {
+        val continueBook = allBooks.filter { it.progress > 0 }.maxByOrNull { it.lastReadAt }
+            ?: allBooks.firstOrNull { it.progress > 0 }
+
+        if (continueBook != null && currentFilter == "all" && currentQuery.isBlank()) {
+            binding.cardContinueReading.visibility = View.VISIBLE
+            binding.tvHeroTitle.text = continueBook.title
+            binding.tvHeroAuthor.text = continueBook.author
+            binding.tvHeroFormatBadge.text = continueBook.format.uppercase()
+            binding.pbHeroProgress.progress = continueBook.progress.toInt()
+            binding.tvHeroProgressPercent.text = "${continueBook.progress.toInt()}%"
+
+            if (!continueBook.coverImagePath.isNullOrEmpty() && File(continueBook.coverImagePath).exists()) {
+                binding.ivHeroCover.visibility = View.VISIBLE
+                binding.tvHeroCoverInitial.visibility = View.GONE
+                binding.ivHeroCover.setImageURI(Uri.fromFile(File(continueBook.coverImagePath)))
+            } else {
+                binding.ivHeroCover.visibility = View.GONE
+                binding.tvHeroCoverInitial.visibility = View.VISIBLE
+                binding.tvHeroCoverInitial.text = continueBook.title.take(1).uppercase()
+                try {
+                    binding.layoutHeroCover.setBackgroundColor(Color.parseColor(continueBook.coverColor))
+                } catch (e: Exception) {}
+            }
+
+            val openBookAction = {
+                val intent = Intent(this, ReaderActivity::class.java).apply {
+                    putExtra(ReaderActivity.EXTRA_BOOK_ID, continueBook.id)
+                }
+                startActivity(intent)
+            }
+            binding.btnResumeReading.setOnClickListener { openBookAction() }
+            binding.cardContinueReading.setOnClickListener { openBookAction() }
+        } else {
+            binding.cardContinueReading.visibility = View.GONE
         }
     }
 

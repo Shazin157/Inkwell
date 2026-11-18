@@ -78,20 +78,36 @@
                 android:columnCount="3"
                 android:rowCount="2">
 
-                <!-- Theme Light -->
+                <!-- Theme Paperwhite (Kindle Carta) -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnThemeLight"
+                    android:id="@+id/btnThemePaperwhite"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
                     android:layout_margin="3dp"
-                    android:backgroundTint="@color/reader_light_bg"
-                    android:text="Light\nAa"
-                    android:textColor="@color/reader_light_text"
-                    android:textSize="11sp"
+                    android:backgroundTint="@color/reader_paperwhite_bg"
+                    android:text="Paperwhite\nAa"
+                    android:textColor="@color/reader_paperwhite_text"
+                    android:textSize="10sp"
                     android:textStyle="bold"
                     app:cornerRadius="10dp"
-                    app:strokeColor="@color/reader_light_border"
+                    app:strokeColor="@color/reader_paperwhite_border"
+                    app:strokeWidth="1.5dp" />
+
+                <!-- Theme Kindle Warm Light -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnThemeWarmLight"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="3dp"
+                    android:backgroundTint="@color/reader_warmlight_bg"
+                    android:text="Warm Light\nAa"
+                    android:textColor="@color/reader_warmlight_text"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="10dp"
+                    app:strokeColor="@color/reader_warmlight_border"
                     app:strokeWidth="1dp" />
 
                 <!-- Theme Sepia -->
@@ -104,7 +120,7 @@
                     android:backgroundTint="@color/reader_sepia_bg"
                     android:text="Sepia\nAa"
                     android:textColor="@color/reader_sepia_text"
-                    android:textSize="11sp"
+                    android:textSize="10sp"
                     android:textStyle="bold"
                     app:cornerRadius="10dp"
                     app:strokeColor="@color/reader_sepia_border"
@@ -120,7 +136,7 @@
                     android:backgroundTint="@color/reader_sand_bg"
                     android:text="Sand\nAa"
                     android:textColor="@color/reader_sand_text"
-                    android:textSize="11sp"
+                    android:textSize="10sp"
                     android:textStyle="bold"
                     app:cornerRadius="10dp"
                     app:strokeColor="@color/reader_sand_border"
@@ -136,7 +152,7 @@
                     android:backgroundTint="@color/reader_charcoal_bg"
                     android:text="Charcoal\nAa"
                     android:textColor="@color/reader_charcoal_text"
-                    android:textSize="11sp"
+                    android:textSize="10sp"
                     android:textStyle="bold"
                     app:cornerRadius="10dp"
                     app:strokeColor="@color/reader_charcoal_border"
@@ -152,28 +168,145 @@
                     android:backgroundTint="@color/reader_oled_bg"
                     android:text="OLED\nAa"
                     android:textColor="@color/reader_oled_text"
-                    android:textSize="11sp"
+                    android:textSize="10sp"
                     android:textStyle="bold"
                     app:cornerRadius="10dp"
                     app:strokeColor="@color/reader_oled_border"
                     app:strokeWidth="1dp" />
-
-                <!-- Theme Emerald -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnThemeEmerald"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="3dp"
-                    android:backgroundTint="@color/reader_emerald_bg"
-                    android:text="Mint\nAa"
-                    android:textColor="@color/reader_emerald_text"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="10dp"
-                    app:strokeColor="@color/reader_emerald_border"
-                    app:strokeWidth="1dp" />
             </GridLayout>
+
+            <!-- Authentic Kindle E-Ink & Paper Display Controls -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_setting_card"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="KINDLE E-INK &amp; PAPER SIMULATION"
+                    android:textColor="@color/amber_400"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <!-- Paper Matte Texture Toggle -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Paper Matte Texture"
+                            android:textColor="@color/white"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tactile book paper fiber overlay (anti-glare)"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switchPaperMatte"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        app:thumbTint="@color/amber_400"
+                        app:trackTint="@color/app_surface_variant" />
+                </LinearLayout>
+
+                <!-- Kindle Warm Light Slider -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Kindle Warm Frontlight"
+                        android:textColor="@color/white"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvWarmthPercent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12%"
+                        android:textColor="@color/amber_400"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <SeekBar
+                    android:id="@+id/sbScreenWarmth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:max="100"
+                    android:progress="12"
+                    android:progressTint="@color/amber_500"
+                    android:thumbTint="@color/amber_400" />
+
+                <!-- E-Ink Refresh Pulse Flash Toggle -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="E-Ink Micro-Refresh Flash"
+                            android:textColor="@color/white"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Subtle electrophoretic particle refresh on turn"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switchEinkFlash"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:thumbTint="@color/amber_400"
+                        app:trackTint="@color/app_surface_variant" />
+                </LinearLayout>
+
+            </LinearLayout>
 
             <!-- PDF View & Zoom Controls -->
             <LinearLayout
