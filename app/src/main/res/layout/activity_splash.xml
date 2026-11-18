@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/app_bg">
+
+    <LinearLayout
+        android:id="@+id/layoutSplashContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <!-- Paper Portal Logo Emblem -->
+        <FrameLayout
+            android:id="@+id/cardSplashLogo"
+            android:layout_width="84dp"
+            android:layout_height="84dp"
+            android:background="@drawable/bg_setting_card"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/ivSplashLogo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_inkwell_logo" />
+        </FrameLayout>
+
+        <!-- Brand Name -->
+        <TextView
+            android:id="@+id/tvSplashTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:letterSpacing="0.18"
+            android:text="INKWELL"
+            android:textColor="@color/text_primary"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <!-- Subtitle -->
+        <TextView
+            android:id="@+id/tvSplashSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:letterSpacing="0.05"
+            android:text="Your Reading Sanctuary"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp" />
+
+        <!-- Minimal Ambient Pulsing Bar -->
+        <ProgressBar
+            android:id="@+id/pbSplashLoading"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="60dp"
+            android:layout_height="3dp"
+            android:layout_marginTop="28dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/brand_primary" />
+
+    </LinearLayout>
+
+    <!-- Version footer -->
+    <TextView
+        android:id="@+id/tvSplashVersion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="28dp"
+        android:text="v2.2"
+        android:textColor="@color/text_tertiary"
+        android:textSize="11sp" />
+
+</FrameLayout>

@@ -26,7 +26,13 @@ class ZoomablePdfView @JvmOverloads constructor(
     private val minScale = 1.0f
     private val maxScale = 4.0f
 
-    private var isFitWidth = true
+    enum class PdfFitMode {
+        FIT_WIDTH,
+        FIT_SCREEN, // Whole screen fill (0 gaps anywhere)
+        FIT_PAGE
+    }
+
+    var fitMode: PdfFitMode = PdfFitMode.FIT_SCREEN
     private var currentBitmap: Bitmap? = null
 
     var onSingleTapListener: (() -> Unit)? = null
@@ -114,8 +120,13 @@ class ZoomablePdfView @JvmOverloads constructor(
         }
     }
 
+    fun applyFitMode(mode: PdfFitMode) {
+        this.fitMode = mode
+        applyInitialScale()
+    }
+
     fun setFitWidthMode(fitWidth: Boolean) {
-        this.isFitWidth = fitWidth
+        this.fitMode = if (fitWidth) PdfFitMode.FIT_WIDTH else PdfFitMode.FIT_PAGE
         applyInitialScale()
     }
 
@@ -153,22 +164,35 @@ class ZoomablePdfView @JvmOverloads constructor(
 
         imageMatrixInternal.reset()
 
-        if (isFitWidth) {
-            // Scale so image width fits screen width completely (0 horizontal gaps)
-            val scale = viewW / bmpW
-            imageMatrixInternal.postScale(scale, scale)
-            val scaledH = bmpH * scale
-            val dy = if (scaledH < viewH) (viewH - scaledH) / 2f else 40f // start slightly below top
-            imageMatrixInternal.postTranslate(0f, dy)
-        } else {
-            // Fit entire page on screen
-            val scale = Math.min(viewW / bmpW, viewH / bmpH)
-            imageMatrixInternal.postScale(scale, scale)
-            val scaledW = bmpW * scale
-            val scaledH = bmpH * scale
-            val dx = (viewW - scaledW) / 2f
-            val dy = (viewH - scaledH) / 2f
-            imageMatrixInternal.postTranslate(dx, dy)
+        when (fitMode) {
+            PdfFitMode.FIT_SCREEN -> {
+                // Fit Whole Screen: scale to cover entire display with zero gaps
+                val scale = Math.max(viewW / bmpW, viewH / bmpH)
+                imageMatrixInternal.postScale(scale, scale)
+                val scaledW = bmpW * scale
+                val scaledH = bmpH * scale
+                val dx = (viewW - scaledW) / 2f
+                val dy = (viewH - scaledH) / 2f
+                imageMatrixInternal.postTranslate(dx, dy)
+            }
+            PdfFitMode.FIT_WIDTH -> {
+                // Width fits screen width (0 side gaps, scroll vertically)
+                val scale = viewW / bmpW
+                imageMatrixInternal.postScale(scale, scale)
+                val scaledH = bmpH * scale
+                val dy = if (scaledH < viewH) (viewH - scaledH) / 2f else 32f
+                imageMatrixInternal.postTranslate(0f, dy)
+            }
+            PdfFitMode.FIT_PAGE -> {
+                // Fit entire page on screen (letterboxed)
+                val scale = Math.min(viewW / bmpW, viewH / bmpH)
+                imageMatrixInternal.postScale(scale, scale)
+                val scaledW = bmpW * scale
+                val scaledH = bmpH * scale
+                val dx = (viewW - scaledW) / 2f
+                val dy = (viewH - scaledH) / 2f
+                imageMatrixInternal.postTranslate(dx, dy)
+            }
         }
 
         currentScale = 1.0f

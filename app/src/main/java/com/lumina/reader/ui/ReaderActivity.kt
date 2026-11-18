@@ -34,6 +34,7 @@ import com.lumina.reader.databinding.ActivityReaderBinding
 import com.lumina.reader.databinding.BottomSheetDisplayBinding
 import com.lumina.reader.databinding.DialogTocBinding
 import com.lumina.reader.ui.adapter.TocAdapter
+import com.lumina.reader.ui.view.ZoomablePdfView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -944,19 +945,33 @@ class ReaderActivity : AppCompatActivity() {
         sBinding.layoutTextControls.visibility = if (isPdf) View.GONE else View.VISIBLE
 
         if (isPdf) {
+            fun updatePdfModeButtons() {
+                val active = getColor(R.color.brand_primary)
+                val inactive = getColor(R.color.text_secondary)
+                sBinding.btnPdfFitScreen.setTextColor(if (binding.ivPdfPage.fitMode == ZoomablePdfView.PdfFitMode.FIT_SCREEN) active else inactive)
+                sBinding.btnPdfFitWidth.setTextColor(if (binding.ivPdfPage.fitMode == ZoomablePdfView.PdfFitMode.FIT_WIDTH) active else inactive)
+                sBinding.btnPdfFitPage.setTextColor(if (binding.ivPdfPage.fitMode == ZoomablePdfView.PdfFitMode.FIT_PAGE) active else inactive)
+            }
+
+            sBinding.btnPdfFitScreen.setOnClickListener {
+                binding.ivPdfPage.applyFitMode(ZoomablePdfView.PdfFitMode.FIT_SCREEN)
+                updatePdfModeButtons()
+                Toast.makeText(this, "Fit Whole Screen enabled (0 gaps)", Toast.LENGTH_SHORT).show()
+            }
+
             sBinding.btnPdfFitWidth.setOnClickListener {
-                binding.ivPdfPage.setFitWidthMode(true)
-                sBinding.btnPdfFitWidth.setTextColor(getColor(R.color.brand_primary))
-                sBinding.btnPdfFitPage.setTextColor(Color.WHITE)
-                Toast.makeText(this, "Fit Width enabled (no side gaps)", Toast.LENGTH_SHORT).show()
+                binding.ivPdfPage.applyFitMode(ZoomablePdfView.PdfFitMode.FIT_WIDTH)
+                updatePdfModeButtons()
+                Toast.makeText(this, "Fit Width enabled", Toast.LENGTH_SHORT).show()
             }
 
             sBinding.btnPdfFitPage.setOnClickListener {
-                binding.ivPdfPage.setFitWidthMode(false)
-                sBinding.btnPdfFitPage.setTextColor(getColor(R.color.brand_primary))
-                sBinding.btnPdfFitWidth.setTextColor(Color.WHITE)
-                Toast.makeText(this, "Fit Entire Page enabled", Toast.LENGTH_SHORT).show()
+                binding.ivPdfPage.applyFitMode(ZoomablePdfView.PdfFitMode.FIT_PAGE)
+                updatePdfModeButtons()
+                Toast.makeText(this, "Fit Page enabled", Toast.LENGTH_SHORT).show()
             }
+
+            updatePdfModeButtons()
 
             sBinding.btnPdfZoomIn.setOnClickListener {
                 binding.ivPdfPage.zoomIn()

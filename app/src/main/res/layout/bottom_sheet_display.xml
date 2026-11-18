@@ -259,30 +259,40 @@
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnPdfFitScreen"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="3dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/app_surface_variant"
+                        android:text="Fit Screen"
+                        android:textColor="@color/brand_primary"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="10dp" />
+
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnPdfFitWidth"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginHorizontal="3dp"
                         android:layout_weight="1"
                         android:backgroundTint="@color/app_surface_variant"
-                        android:text="Fit Width (No Gaps)"
-                        android:textColor="@color/amber_400"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="10dp"
-                        app:strokeColor="@color/amber_500"
-                        app:strokeWidth="1dp" />
+                        android:text="Fit Width"
+                        android:textColor="@color/text_primary"
+                        android:textSize="11sp"
+                        app:cornerRadius="10dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnPdfFitPage"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
+                        android:layout_marginStart="3dp"
                         android:layout_weight="1"
                         android:backgroundTint="@color/app_surface_variant"
-                        android:text="Fit Entire Page"
-                        android:textColor="@color/white"
-                        android:textSize="12sp"
+                        android:text="Fit Page"
+                        android:textColor="@color/text_primary"
+                        android:textSize="11sp"
                         app:cornerRadius="10dp" />
                 </LinearLayout>
 
