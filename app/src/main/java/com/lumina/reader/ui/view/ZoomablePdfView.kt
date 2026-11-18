@@ -17,22 +17,22 @@ class ZoomablePdfView @JvmOverloads constructor(
 ) : AppCompatImageView(context, attrs, defStyleAttr) {
 
     private val imageMatrixInternal = Matrix()
-    private val matrixValues = FloatArray(9)
 
-    private var scaleDetector: ScaleGestureDetector
-    private var gestureDetector: GestureDetector
+    private val scaleDetector: ScaleGestureDetector
+    private val gestureDetector: GestureDetector
 
     private var currentScale = 1.0f
-    private val minScale = 1.0f
-    private val maxScale = 4.0f
+    private val minScale = 0.8f
+    private val maxScale = 5.0f
 
     enum class PdfFitMode {
-        FIT_WIDTH,
-        FIT_SCREEN, // Whole screen fill (0 gaps anywhere)
-        FIT_PAGE
+        FIT_WIDTH,  // 100% width edge-to-edge, zero side gaps, scrolls vertically from top
+        FIT_PAGE,   // Entire page fit inside view (proportional)
+        FIT_SCREEN  // Edge-to-edge full screen fill
     }
 
-    var fitMode: PdfFitMode = PdfFitMode.FIT_SCREEN
+    var fitMode: PdfFitMode = PdfFitMode.FIT_WIDTH
+
     private var currentBitmap: Bitmap? = null
 
     var onSingleTapListener: (() -> Unit)? = null
@@ -42,13 +42,17 @@ class ZoomablePdfView @JvmOverloads constructor(
         scaleType = ScaleType.MATRIX
 
         scaleDetector = ScaleGestureDetector(context, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
+                return true
+            }
+
             override fun onScale(detector: ScaleGestureDetector): Boolean {
-                val scaleFactor = detector.scaleFactor
-                val targetScale = currentScale * scaleFactor
+                val factor = detector.scaleFactor
+                val targetScale = currentScale * factor
 
                 if (targetScale in minScale..maxScale) {
                     currentScale = targetScale
-                    imageMatrixInternal.postScale(scaleFactor, scaleFactor, detector.focusX, detector.focusY)
+                    imageMatrixInternal.postScale(factor, factor, detector.focusX, detector.focusY)
                     checkMatrixBounds()
                     imageMatrix = imageMatrixInternal
                 }
@@ -57,13 +61,18 @@ class ZoomablePdfView @JvmOverloads constructor(
         })
 
         gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onDown(e: MotionEvent): Boolean {
+                // Must return true so Android sends all subsequent MOVE and UP gestures to this view
+                return true
+            }
+
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                 onSingleTapListener?.invoke()
                 return true
             }
 
             override fun onDoubleTap(e: MotionEvent): Boolean {
-                if (currentScale > 1.2f) {
+                if (currentScale > 1.25f) {
                     resetZoom()
                 } else {
                     val targetScale = 2.2f
@@ -82,6 +91,7 @@ class ZoomablePdfView @JvmOverloads constructor(
                 distanceX: Float,
                 distanceY: Float
             ): Boolean {
+                if (scaleDetector.isInProgress) return false
                 imageMatrixInternal.postTranslate(-distanceX, -distanceY)
                 checkMatrixBounds()
                 imageMatrix = imageMatrixInternal
@@ -94,8 +104,9 @@ class ZoomablePdfView @JvmOverloads constructor(
                 velocityX: Float,
                 velocityY: Float
             ): Boolean {
-                // If not zoomed in, allow left/right swipe to flip pages
-                if (currentScale <= 1.15f && e1 != null) {
+                if (scaleDetector.isInProgress) return false
+                // If not deeply zoomed in, allow left/right swipe to flip pages
+                if (currentScale <= 1.2f && e1 != null) {
                     val diffX = e2.x - e1.x
                     val diffY = e2.y - e1.y
                     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 100 && Math.abs(velocityX) > 200) {
@@ -112,11 +123,23 @@ class ZoomablePdfView @JvmOverloads constructor(
         })
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (w > 0 && h > 0 && currentBitmap != null) {
+            applyInitialScale()
+        }
+    }
+
     fun setPdfBitmap(bitmap: Bitmap) {
         currentBitmap = bitmap
         setImageBitmap(bitmap)
-        post {
+        currentScale = 1.0f
+        if (width > 0 && height > 0) {
             applyInitialScale()
+        } else {
+            post {
+                applyInitialScale()
+            }
         }
     }
 
@@ -125,13 +148,8 @@ class ZoomablePdfView @JvmOverloads constructor(
         applyInitialScale()
     }
 
-    fun setFitWidthMode(fitWidth: Boolean) {
-        this.fitMode = if (fitWidth) PdfFitMode.FIT_WIDTH else PdfFitMode.FIT_PAGE
-        applyInitialScale()
-    }
-
     fun zoomIn() {
-        val targetScale = (currentScale * 1.3f).coerceAtMost(maxScale)
+        val targetScale = (currentScale * 1.35f).coerceAtMost(maxScale)
         val factor = targetScale / currentScale
         currentScale = targetScale
         imageMatrixInternal.postScale(factor, factor, width / 2f, height / 2f)
@@ -140,7 +158,7 @@ class ZoomablePdfView @JvmOverloads constructor(
     }
 
     fun zoomOut() {
-        val targetScale = (currentScale / 1.3f).coerceAtLeast(minScale)
+        val targetScale = (currentScale / 1.35f).coerceAtLeast(minScale)
         val factor = targetScale / currentScale
         currentScale = targetScale
         imageMatrixInternal.postScale(factor, factor, width / 2f, height / 2f)
@@ -165,9 +183,15 @@ class ZoomablePdfView @JvmOverloads constructor(
         imageMatrixInternal.reset()
 
         when (fitMode) {
-            PdfFitMode.FIT_SCREEN -> {
-                // Fit Whole Screen: scale to cover entire display with zero gaps
-                val scale = Math.max(viewW / bmpW, viewH / bmpH)
+            PdfFitMode.FIT_WIDTH -> {
+                // Width fits screen width (0 side gaps, aligned flush to top)
+                val scale = viewW / bmpW
+                imageMatrixInternal.postScale(scale, scale)
+                imageMatrixInternal.postTranslate(0f, 0f)
+            }
+            PdfFitMode.FIT_PAGE -> {
+                // Fit entire page inside the display bounds (proportional letterboxed)
+                val scale = Math.min(viewW / bmpW, viewH / bmpH)
                 imageMatrixInternal.postScale(scale, scale)
                 val scaledW = bmpW * scale
                 val scaledH = bmpH * scale
@@ -175,17 +199,9 @@ class ZoomablePdfView @JvmOverloads constructor(
                 val dy = (viewH - scaledH) / 2f
                 imageMatrixInternal.postTranslate(dx, dy)
             }
-            PdfFitMode.FIT_WIDTH -> {
-                // Width fits screen width (0 side gaps, scroll vertically)
-                val scale = viewW / bmpW
-                imageMatrixInternal.postScale(scale, scale)
-                val scaledH = bmpH * scale
-                val dy = if (scaledH < viewH) (viewH - scaledH) / 2f else 32f
-                imageMatrixInternal.postTranslate(0f, dy)
-            }
-            PdfFitMode.FIT_PAGE -> {
-                // Fit entire page on screen (letterboxed)
-                val scale = Math.min(viewW / bmpW, viewH / bmpH)
+            PdfFitMode.FIT_SCREEN -> {
+                // Whole screen fill (0 gaps anywhere)
+                val scale = Math.max(viewW / bmpW, viewH / bmpH)
                 imageMatrixInternal.postScale(scale, scale)
                 val scaledW = bmpW * scale
                 val scaledH = bmpH * scale
@@ -196,6 +212,7 @@ class ZoomablePdfView @JvmOverloads constructor(
         }
 
         currentScale = 1.0f
+        checkMatrixBounds()
         imageMatrix = imageMatrixInternal
     }
 
@@ -211,7 +228,7 @@ class ZoomablePdfView @JvmOverloads constructor(
         var deltaX = 0f
         var deltaY = 0f
 
-        // Center horizontally if smaller than view, otherwise clamp edges
+        // Horizontal constraints
         if (rect.width() <= viewW) {
             deltaX = (viewW - rect.width()) / 2f - rect.left
         } else {
@@ -222,9 +239,13 @@ class ZoomablePdfView @JvmOverloads constructor(
             }
         }
 
-        // Center vertically if smaller than view, otherwise clamp edges
+        // Vertical constraints
         if (rect.height() <= viewH) {
-            deltaY = (viewH - rect.height()) / 2f - rect.top
+            if (fitMode == PdfFitMode.FIT_WIDTH) {
+                deltaY = -rect.top // Align flush to top
+            } else {
+                deltaY = (viewH - rect.height()) / 2f - rect.top
+            }
         } else {
             if (rect.top > 0f) {
                 deltaY = -rect.top
@@ -237,8 +258,8 @@ class ZoomablePdfView @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        var handled = scaleDetector.onTouchEvent(event)
-        handled = gestureDetector.onTouchEvent(event) || handled
-        return handled || super.onTouchEvent(event)
+        val scaleHandled = scaleDetector.onTouchEvent(event)
+        val gestureHandled = gestureDetector.onTouchEvent(event)
+        return scaleHandled || gestureHandled || super.onTouchEvent(event) || true
     }
 }

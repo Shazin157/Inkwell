@@ -131,6 +131,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
+        // Formats Info Button
+        binding.btnFormatsInfo.setOnClickListener {
+            showSupportedFormatsDialog()
+        }
+
         // Upload FAB
         binding.fabUpload.setOnClickListener {
             openDocumentLauncher.launch(
@@ -141,6 +146,11 @@ class MainActivity : AppCompatActivity() {
                     "*/*"
                 )
             )
+        }
+
+        binding.fabUpload.setOnLongClickListener {
+            showSupportedFormatsDialog()
+            true
         }
 
         // Load Starter Classics Button
@@ -345,6 +355,23 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showSupportedFormatsDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Supported Book Formats")
+            .setMessage(
+                "Inkwell supports the following file formats:\n\n" +
+                "📖  EPUB (.epub)\nStandard electronic books with reflowable text, chapters, embedded images, and custom font sizing.\n\n" +
+                "📄  PDF (.pdf)\nFixed-layout documents and books with Fit Width (0 side gaps), Whole Screen Fill, pinch zoom, and e-ink contrast tuning.\n\n" +
+                "📝  Text (.txt, .md)\nPlain text and Markdown notes or books.\n\n" +
+                "Tip: You can import files via the '+' button, or open/share them directly from your Downloads folder or Files app into Inkwell."
+            )
+            .setPositiveButton("Import Book") { _, _ ->
+                binding.fabUpload.performClick()
+            }
+            .setNegativeButton("Close", null)
             .show()
     }
 }

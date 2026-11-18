@@ -461,6 +461,9 @@ class ReaderActivity : AppCompatActivity() {
                     font-size: ${displaySettings.fontSize}px !important;
                     line-height: ${displaySettings.lineSpacing} !important;
                     color: $text !important;
+                    font-weight: ${if (displaySettings.theme == "paperwhite") "600" else "normal"} !important;
+                    -webkit-font-smoothing: antialiased !important;
+                    text-rendering: optimizeLegibility !important;
                 }
                 h1, h2, h3, h4, h5, h6 {
                     margin-top: 1.2em !important;
@@ -554,6 +557,12 @@ class ReaderActivity : AppCompatActivity() {
         binding.ivPdfPage.visibility = View.VISIBLE
         binding.svTextContent.visibility = View.GONE
 
+        binding.ivPdfPage.fitMode = when (displaySettings.pdfFitMode) {
+            "page" -> ZoomablePdfView.PdfFitMode.FIT_PAGE
+            "screen" -> ZoomablePdfView.PdfFitMode.FIT_SCREEN
+            else -> ZoomablePdfView.PdfFitMode.FIT_WIDTH
+        }
+
         try {
             val file = File(book.filePath)
             pdfDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
@@ -605,6 +614,20 @@ class ReaderActivity : AppCompatActivity() {
                     val colorMatrix = ColorMatrix().apply {
                         setScale(0.95f, 0.90f, 0.80f, 1.0f)
                     }
+                    binding.ivPdfPage.colorFilter = ColorMatrixColorFilter(colorMatrix)
+                }
+                "paperwhite" -> {
+                    // Kindle Paperwhite high-contrast ink: deepen black ink and increase boldness
+                    val contrast = 1.35f
+                    val translate = (-0.5f * contrast + 0.5f) * 255f - 18f
+                    val colorMatrix = ColorMatrix(
+                        floatArrayOf(
+                            contrast, 0f, 0f, 0f, translate,
+                            0f, contrast, 0f, 0f, translate,
+                            0f, 0f, contrast, 0f, translate,
+                            0f, 0f, 0f, 1f, 0f
+                        )
+                    )
                     binding.ivPdfPage.colorFilter = ColorMatrixColorFilter(colorMatrix)
                 }
                 else -> {
@@ -670,11 +693,21 @@ class ReaderActivity : AppCompatActivity() {
             120
         )
 
-        binding.tvTextBookContent.typeface = when (displaySettings.fontFamily) {
+        val baseTypeface = when (displaySettings.fontFamily) {
             "sans" -> Typeface.SANS_SERIF
             "mono" -> Typeface.MONOSPACE
             else -> Typeface.SERIF
         }
+        val weight = if (displaySettings.theme == "paperwhite") {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                Typeface.create(baseTypeface, 600, false)
+            } else {
+                Typeface.create(baseTypeface, Typeface.BOLD)
+            }
+        } else {
+            baseTypeface
+        }
+        binding.tvTextBookContent.typeface = weight
     }
 
     // ----------------------------------------------------
@@ -946,29 +979,47 @@ class ReaderActivity : AppCompatActivity() {
 
         if (isPdf) {
             fun updatePdfModeButtons() {
-                val active = getColor(R.color.brand_primary)
-                val inactive = getColor(R.color.text_secondary)
-                sBinding.btnPdfFitScreen.setTextColor(if (binding.ivPdfPage.fitMode == ZoomablePdfView.PdfFitMode.FIT_SCREEN) active else inactive)
-                sBinding.btnPdfFitWidth.setTextColor(if (binding.ivPdfPage.fitMode == ZoomablePdfView.PdfFitMode.FIT_WIDTH) active else inactive)
-                sBinding.btnPdfFitPage.setTextColor(if (binding.ivPdfPage.fitMode == ZoomablePdfView.PdfFitMode.FIT_PAGE) active else inactive)
-            }
+                val activeBg = getColor(R.color.brand_primary)
+                val activeText = getColor(R.color.brand_on_primary)
+                val inactiveBg = getColor(R.color.app_surface_variant)
+                val inactiveText = getColor(R.color.text_secondary)
 
-            sBinding.btnPdfFitScreen.setOnClickListener {
-                binding.ivPdfPage.applyFitMode(ZoomablePdfView.PdfFitMode.FIT_SCREEN)
-                updatePdfModeButtons()
-                Toast.makeText(this, "Fit Whole Screen enabled (0 gaps)", Toast.LENGTH_SHORT).show()
+                val isWidth = binding.ivPdfPage.fitMode == ZoomablePdfView.PdfFitMode.FIT_WIDTH
+                val isScreen = binding.ivPdfPage.fitMode == ZoomablePdfView.PdfFitMode.FIT_SCREEN
+                val isPage = binding.ivPdfPage.fitMode == ZoomablePdfView.PdfFitMode.FIT_PAGE
+
+                sBinding.btnPdfFitWidth.setBackgroundColor(if (isWidth) activeBg else inactiveBg)
+                sBinding.btnPdfFitWidth.setTextColor(if (isWidth) activeText else inactiveText)
+
+                sBinding.btnPdfFitScreen.setBackgroundColor(if (isScreen) activeBg else inactiveBg)
+                sBinding.btnPdfFitScreen.setTextColor(if (isScreen) activeText else inactiveText)
+
+                sBinding.btnPdfFitPage.setBackgroundColor(if (isPage) activeBg else inactiveBg)
+                sBinding.btnPdfFitPage.setTextColor(if (isPage) activeText else inactiveText)
             }
 
             sBinding.btnPdfFitWidth.setOnClickListener {
                 binding.ivPdfPage.applyFitMode(ZoomablePdfView.PdfFitMode.FIT_WIDTH)
+                displaySettings.pdfFitMode = "width"
+                repository.saveDisplaySettings(displaySettings)
                 updatePdfModeButtons()
-                Toast.makeText(this, "Fit Width enabled", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Fit Width: 100% width (0 side gaps)", Toast.LENGTH_SHORT).show()
+            }
+
+            sBinding.btnPdfFitScreen.setOnClickListener {
+                binding.ivPdfPage.applyFitMode(ZoomablePdfView.PdfFitMode.FIT_SCREEN)
+                displaySettings.pdfFitMode = "screen"
+                repository.saveDisplaySettings(displaySettings)
+                updatePdfModeButtons()
+                Toast.makeText(this, "Fit Whole Screen: edge-to-edge fill", Toast.LENGTH_SHORT).show()
             }
 
             sBinding.btnPdfFitPage.setOnClickListener {
                 binding.ivPdfPage.applyFitMode(ZoomablePdfView.PdfFitMode.FIT_PAGE)
+                displaySettings.pdfFitMode = "page"
+                repository.saveDisplaySettings(displaySettings)
                 updatePdfModeButtons()
-                Toast.makeText(this, "Fit Page enabled", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Fit Page: entire page visible", Toast.LENGTH_SHORT).show()
             }
 
             updatePdfModeButtons()

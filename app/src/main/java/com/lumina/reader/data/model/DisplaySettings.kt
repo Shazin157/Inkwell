@@ -11,5 +11,6 @@ data class DisplaySettings(
     var readerName: String = "Reader",
     var appThemeMode: String = "system", // "system", "light", "dark"
     var einkMatteOverlay: Boolean = true,
-    var einkPageRefreshFlash: Boolean = false
+    var einkPageRefreshFlash: Boolean = false,
+    var pdfFitMode: String = "width" // "width", "page", "screen"
 )
