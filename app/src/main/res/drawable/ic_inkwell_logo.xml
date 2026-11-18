@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+  <!-- Minimal Open Book & Inkwell Emblem -->
+  <path
+      android:fillColor="@color/brand_primary"
+      android:pathData="M24,10c-3.5,-3.2 -8.5,-4 -13,-4c-2.2,0 -4.2,0.3 -6,1v27.2c1.8,-0.7 3.8,-1 6,-1c4.5,0 9.5,0.8 13,4c3.5,-3.2 8.5,-4 13,-4c2.2,0 4.2,0.3 6,1V7c-1.8,-0.7 -3.8,-1 -6,-1C32.5,6 27.5,6.8 24,10zM22,33.5c-3,-2.2 -7,-2.8 -11,-2.8c-2,0 -4,0.3 -5,0.7V9.7c1,-0.4 2.8,-0.7 5,-0.7c3.8,0 7.8,0.7 11,2.8V33.5zM42,31.4c-1,-0.4 -3,-0.7 -5,-0.7c-4,0 -8,0.6 -11,2.8V11.8c3.2,-2.1 7.2,-2.8 11,-2.8c2.2,0 4,0.3 5,0.7V31.4z"/>
+  <!-- Central Subtle Ink Nib / Bookmark -->
+  <path
+      android:fillColor="@color/brand_primary_variant"
+      android:pathData="M23,6h2v12l-1,-1l-1,1z"/>
+</vector>

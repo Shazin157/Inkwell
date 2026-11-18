@@ -24,15 +24,15 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Back"
             android:src="@drawable/ic_arrow_back"
-            app:tint="@color/white" />
+            app:tint="@color/text_primary" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:text="Kindle Settings"
-            android:textColor="@color/white"
+            android:text="Settings"
+            android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -49,12 +49,93 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- 1. Reader Profile & Greeting -->
+            <!-- 1. App Theme (Light / Dark Mode) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="APP THEME &amp; APPEARANCE"
+                android:textColor="@color/brand_primary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_setting_card"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Display Mode"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Choose how Inkwell looks throughout the app"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnThemeSystem"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="System"
+                        android:textSize="12sp"
+                        app:cornerRadius="10dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnThemeLight"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginHorizontal="2dp"
+                        android:layout_weight="1"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="Light"
+                        android:textSize="12sp"
+                        app:cornerRadius="10dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnThemeDark"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_weight="1"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="Dark"
+                        android:textSize="12sp"
+                        app:cornerRadius="10dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 2. Reader Profile & Greeting -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:text="READER IDENTITY"
-                android:textColor="@color/amber_400"
+                android:textColor="@color/brand_primary"
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
@@ -77,7 +158,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Reader Greeting Name"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -87,7 +168,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="Reader"
-                        android:textColor="@color/amber_400"
+                        android:textColor="@color/brand_primary"
                         android:textSize="12sp" />
                 </LinearLayout>
 
@@ -97,16 +178,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Edit"
-                    android:textColor="@color/amber_400" />
+                    android:textColor="@color/brand_primary" />
             </LinearLayout>
 
-            <!-- 2. Kindle Paperwhite & E-Ink Engine -->
+            <!-- 3. E-Ink & Paper Simulation -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="KINDLE E-INK &amp; PAPER DISPLAY"
-                android:textColor="@color/amber_400"
+                android:layout_marginTop="20dp"
+                android:text="E-INK &amp; PAPER DISPLAY"
+                android:textColor="@color/brand_primary"
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
@@ -130,7 +211,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Physical Paper Matte Grain"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -138,7 +219,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Simulates tactile paper fibers and anti-glare texture"
+                        android:text="Simulates tactile book paper fibers and anti-glare"
                         android:textColor="@color/text_secondary"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -147,62 +228,7 @@
                     android:id="@+id/switchSettingsPaperMatte"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="true"
-                    app:thumbTint="@color/amber_400"
-                    app:trackTint="@color/app_surface_variant" />
-            </LinearLayout>
-
-            <!-- Kindle Warm Light Slider -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_setting_card"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Kindle Warm Frontlight"
-                        android:textColor="@color/white"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tvSettingsWarmthPercent"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="12%"
-                        android:textColor="@color/amber_400"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="Soft amber glow for nighttime reading without eye strain"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="11sp" />
-
-                <SeekBar
-                    android:id="@+id/sbSettingsWarmth"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:max="100"
-                    android:progress="12"
-                    android:progressTint="@color/amber_500"
-                    android:thumbTint="@color/amber_400" />
+                    android:checked="true" />
             </LinearLayout>
 
             <!-- E-Ink Refresh Pulse Flash Toggle -->
@@ -224,8 +250,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="E-Ink Screen Refresh Pulse"
-                        android:textColor="@color/white"
+                        android:text="E-Ink Micro-Refresh Pulse"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -233,7 +259,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Subtle electrophoretic micro-flash when turning pages"
+                        android:text="Subtle electrophoretic particle refresh when turning pages"
                         android:textColor="@color/text_secondary"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -241,9 +267,7 @@
                 <com.google.android.material.materialswitch.MaterialSwitch
                     android:id="@+id/switchSettingsEinkFlash"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:thumbTint="@color/amber_400"
-                    app:trackTint="@color/app_surface_variant" />
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
             <!-- Keep Screen Awake Toggle -->
@@ -266,7 +290,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Keep Screen Awake"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -283,18 +307,16 @@
                     android:id="@+id/switchSettingsKeepAwake"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="true"
-                    app:thumbTint="@color/amber_400"
-                    app:trackTint="@color/app_surface_variant" />
+                    android:checked="true" />
             </LinearLayout>
 
-            <!-- 3. Storage & Cache Maintenance -->
+            <!-- 4. Storage & Cache Maintenance -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:text="STORAGE &amp; MAINTENANCE"
-                android:textColor="@color/amber_400"
+                android:textColor="@color/brand_primary"
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
@@ -317,7 +339,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Clear Unpacked EPUB Cache"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -337,17 +359,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Clear"
-                    android:textColor="@color/amber_400"
-                    app:strokeColor="@color/amber_500" />
+                    android:textColor="@color/brand_primary"
+                    app:strokeColor="@color/brand_primary" />
             </LinearLayout>
 
-            <!-- 4. About Inkwell -->
+            <!-- 5. About Inkwell -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:text="ABOUT INKWELL"
-                android:textColor="@color/amber_400"
+                android:textColor="@color/brand_primary"
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
@@ -363,8 +385,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Inkwell E-Reader v2.1"
-                    android:textColor="@color/white"
+                    android:text="Inkwell E-Reader v2.2"
+                    android:textColor="@color/text_primary"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -373,7 +395,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:lineSpacingMultiplier="1.3"
-                    android:text="Kindle Paperwhite Sanctuary • 100% Offline • EPUB, PDF &amp; TXT"
+                    android:text="Kindle Paperwhite Sanctuary • Google Expressive Material Design • 100% Offline"
                     android:textColor="@color/text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>

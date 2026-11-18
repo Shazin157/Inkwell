@@ -28,12 +28,10 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:background="@drawable/bg_icon_amber"
-                    android:padding="7dp"
-                    android:src="@drawable/ic_book"
-                    app:tint="@color/black" />
+                    android:id="@+id/ivLogo"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:src="@drawable/ic_inkwell_logo" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -47,7 +45,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Good evening, Reader"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text_primary"
                         android:textSize="17sp"
                         android:textStyle="bold" />
 
@@ -69,7 +67,7 @@
                     android:contentDescription="Settings"
                     android:padding="8dp"
                     android:src="@drawable/ic_settings"
-                    app:tint="@color/white" />
+                    app:tint="@color/text_primary" />
 
             </LinearLayout>
 
@@ -208,7 +206,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="JUMP BACK IN"
-                            android:textColor="@color/amber_400"
+                            android:textColor="@color/brand_primary"
                             android:textSize="10sp"
                             android:textStyle="bold" />
 
@@ -221,7 +219,7 @@
                             android:paddingHorizontal="4dp"
                             android:paddingVertical="1dp"
                             android:text="EPUB"
-                            android:textColor="@color/amber_400"
+                            android:textColor="@color/brand_primary"
                             android:textSize="9sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -234,7 +232,7 @@
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:text="Book Title"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -272,7 +270,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:text="35%"
-                            android:textColor="@color/amber_400"
+                            android:textColor="@color/brand_primary"
                             android:textSize="11sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -285,21 +283,21 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="8dp"
-                    android:backgroundTint="@color/amber_500"
+                    android:backgroundTint="@color/brand_primary"
                     android:insetLeft="0dp"
                     android:insetTop="0dp"
                     android:insetRight="0dp"
                     android:insetBottom="0dp"
-                    android:paddingHorizontal="10dp"
+                    android:paddingHorizontal="12dp"
                     android:paddingVertical="6dp"
                     android:text="Resume"
-                    android:textColor="@color/black"
+                    android:textColor="@color/brand_on_primary"
                     android:textSize="11sp"
                     android:textStyle="bold"
                     app:cornerRadius="10dp"
                     app:icon="@drawable/ic_play"
                     app:iconSize="14dp"
-                    app:iconTint="@color/black" />
+                    app:iconTint="@color/brand_on_primary" />
             </LinearLayout>
 
         </LinearLayout>
@@ -332,15 +330,14 @@
             android:layout_height="64dp"
             android:background="@drawable/bg_empty_circle"
             android:padding="16dp"
-            android:src="@drawable/ic_book"
-            app:tint="@color/amber_400" />
+            android:src="@drawable/ic_inkwell_logo" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@string/empty_library_title"
-            android:textColor="@color/white"
+            android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -358,13 +355,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:backgroundTint="@color/app_surface_variant"
+            android:backgroundTint="@color/brand_primary_container"
             android:text="@string/load_starter_books"
-            android:textColor="@color/amber_400"
+            android:textColor="@color/brand_on_primary_container"
             app:cornerRadius="12dp"
             app:icon="@drawable/ic_sparkles"
-            app:iconTint="@color/amber_400"
-            app:strokeColor="@color/amber_500"
+            app:iconTint="@color/brand_on_primary_container"
+            app:strokeColor="@color/brand_primary"
             app:strokeWidth="1dp" />
     </LinearLayout>
 
@@ -375,10 +372,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="20dp"
-        android:backgroundTint="@color/amber_500"
+        android:backgroundTint="@color/brand_primary"
         android:text="@string/upload_book"
-        android:textColor="@color/black"
+        android:textColor="@color/brand_on_primary"
         app:icon="@drawable/ic_upload"
-        app:iconTint="@color/black" />
+        app:iconTint="@color/brand_on_primary" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

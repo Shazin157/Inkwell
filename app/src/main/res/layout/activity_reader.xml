@@ -55,16 +55,6 @@
             android:clickable="false"
             android:focusable="false" />
 
-        <!-- Kindle Paperwhite Adjustable Warm Frontlight Overlay -->
-        <View
-            android:id="@+id/viewWarmthOverlay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="0"
-            android:background="#FF9E0D"
-            android:clickable="false"
-            android:focusable="false" />
-
         <!-- Authentic E-Ink Electrophoretic Micro-Refresh Flash Screen -->
         <View
             android:id="@+id/viewEinkFlash"
@@ -87,27 +77,26 @@
         android:clickable="false"
         android:focusable="false" />
 
-    <!-- Top Kindle Navigation Bar -->
+    <!-- Minimal Ambient Top Navigation Bar -->
     <LinearLayout
         android:id="@+id/layoutTopBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
-        android:background="#E617191D"
-        android:elevation="8dp"
+        android:elevation="0dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="8dp"
-        android:paddingTop="36dp"
-        android:paddingBottom="12dp">
+        android:paddingHorizontal="10dp"
+        android:paddingTop="30dp"
+        android:paddingBottom="6dp">
 
         <ImageButton
             android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_arrow_back"
-            app:tint="@color/white" />
+            android:padding="6dp"
+            android:src="@drawable/ic_arrow_back" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -122,8 +111,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -132,50 +120,48 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/text_secondary"
-                android:textSize="11sp" />
+                android:textSize="10sp" />
         </LinearLayout>
 
         <!-- Table of Contents -->
         <ImageButton
             android:id="@+id/btnToc"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_list"
-            app:tint="@color/white" />
+            android:padding="6dp"
+            android:src="@drawable/ic_list" />
 
         <!-- Bookmark Button -->
         <ImageButton
             android:id="@+id/btnBookmark"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_bookmark"
-            app:tint="@color/white" />
+            android:padding="6dp"
+            android:src="@drawable/ic_bookmark" />
 
         <!-- Display Settings Button (Aa) -->
         <ImageButton
             android:id="@+id/btnDisplaySettings"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_aa"
-            app:tint="@color/white" />
+            android:padding="6dp"
+            android:src="@drawable/ic_aa" />
     </LinearLayout>
 
-    <!-- Bottom Kindle Navigation Bar -->
+    <!-- Minimal Ambient Bottom Navigation Bar -->
     <LinearLayout
         android:id="@+id/layoutBottomBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="#E617191D"
-        android:elevation="8dp"
+        android:elevation="0dp"
         android:orientation="vertical"
         android:paddingHorizontal="16dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="24dp">
+        android:paddingTop="6dp"
+        android:paddingBottom="16dp">
 
         <!-- Chapter / Location Info -->
         <LinearLayout

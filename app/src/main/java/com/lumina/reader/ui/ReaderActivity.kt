@@ -185,31 +185,85 @@ class ReaderActivity : AppCompatActivity() {
         // Kindle E-Ink Paper Matte Grain Overlay
         binding.viewPaperTexture.isPaperTextureEnabled = displaySettings.einkMatteOverlay
 
-        // Kindle Adjustable Warm Frontlight Overlay
-        val warmthAlpha = (displaySettings.einkWarmthPercent / 100f) * 0.32f
-        binding.viewWarmthOverlay.alpha = warmthAlpha
-
-        // Theme colors
+        // Theme colors (Strictly 4 presets)
         val (bgColor, textColor, barColor) = getThemeColors(displaySettings.theme)
+        val barColorInt = Color.parseColor(barColor)
+        val textColorInt = Color.parseColor(textColor)
+
         binding.layoutReaderRoot.setBackgroundColor(Color.parseColor(bgColor))
-        binding.layoutTopBar.setBackgroundColor(Color.parseColor(barColor))
-        binding.layoutBottomBar.setBackgroundColor(Color.parseColor(barColor))
+        binding.layoutTopBar.setBackgroundColor(barColorInt)
+        binding.layoutBottomBar.setBackgroundColor(barColorInt)
+
+        // Make ambient minimal navigation controls match the paper theme
+        binding.tvReaderTitle.setTextColor(textColorInt)
+        binding.tvReaderAuthor.setTextColor(textColorInt)
+        binding.tvReaderAuthor.alpha = 0.7f
+        binding.tvChapterTitle.setTextColor(textColorInt)
+        binding.tvChapterTitle.alpha = 0.7f
+        binding.tvScrubberPercent.setTextColor(getColor(R.color.brand_primary))
+
+        binding.btnBack.setColorFilter(textColorInt)
+        binding.btnToc.setColorFilter(textColorInt)
+        binding.btnBookmark.setColorFilter(textColorInt)
+        binding.btnDisplaySettings.setColorFilter(textColorInt)
+        binding.btnBottomPrev.setColorFilter(textColorInt)
+        binding.btnBottomNext.setColorFilter(textColorInt)
 
         // Re-apply to currently loaded book
         when (currentBook?.format) {
-            "epub" -> reloadEpubChapter()
+            "epub" -> {
+                updateWebViewDynamicStyles()
+            }
             "pdf" -> renderPdfPage(currentPdfPage)
             "txt", "md" -> styleTextView()
         }
     }
 
+    private fun updateWebViewDynamicStyles() {
+        val (bg, text, _) = getThemeColors(displaySettings.theme)
+        val fontCss = when (displaySettings.fontFamily) {
+            "sans" -> "sans-serif"
+            "mono" -> "monospace"
+            else -> "serif"
+        }
+        val js = """
+            (function() {
+                var style = document.getElementById('inkwell-dynamic-style');
+                if (style) {
+                    style.innerHTML = `
+                        * { box-sizing: border-box !important; }
+                        html, body {
+                            background-color: $bg !important;
+                            color: $text !important;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                        }
+                        body {
+                            padding-left: ${displaySettings.margin}px !important;
+                            padding-right: ${displaySettings.margin}px !important;
+                            padding-top: 56px !important;
+                            padding-bottom: 100px !important;
+                        }
+                        body, p, div, span, h1, h2, h3, h4, h5, h6, li, blockquote, a, td, th {
+                            font-family: $fontCss !important;
+                            font-size: ${displaySettings.fontSize}px !important;
+                            line-height: ${displaySettings.lineSpacing} !important;
+                            color: $text !important;
+                        }
+                    `;
+                }
+            })();
+        """.trimIndent()
+        binding.webViewEpub.evaluateJavascript(js, null)
+    }
+
     private fun triggerEinkRefreshFlash() {
         if (!displaySettings.einkPageRefreshFlash) return
         binding.viewEinkFlash.visibility = View.VISIBLE
-        binding.viewEinkFlash.alpha = 0.85f
+        binding.viewEinkFlash.alpha = 0.25f
         binding.viewEinkFlash.animate()
             .alpha(0f)
-            .setDuration(90)
+            .setDuration(60)
             .withEndAction {
                 binding.viewEinkFlash.visibility = View.GONE
             }
@@ -218,13 +272,11 @@ class ReaderActivity : AppCompatActivity() {
 
     private fun getThemeColors(theme: String): Triple<String, String, String> {
         return when (theme) {
-            "paperwhite" -> Triple("#F7F4EB", "#121316", "#EFECE2")
-            "warm_light" -> Triple("#F5E8C7", "#1A1813", "#ECE0BE")
-            "sepia" -> Triple("#F5EEDC", "#2F2519", "#EDE3CD")
-            "sand" -> Triple("#EBE5D8", "#252422", "#E1D9C9")
-            "charcoal" -> Triple("#1A1B1E", "#E2E5EB", "#141518")
-            "oled" -> Triple("#000000", "#D4D4D8", "#0A0A0C")
-            else -> Triple("#F7F4EB", "#121316", "#EFECE2")
+            "paperwhite" -> Triple("#F7F4EB", "#121316", "#EEF7F4EB")
+            "sand" -> Triple("#EBE5D8", "#252422", "#EEEBE5D8")
+            "charcoal" -> Triple("#1A1B1E", "#E2E5EB", "#EE1A1B1E")
+            "oled" -> Triple("#000000", "#D4D4D8", "#EE000000")
+            else -> Triple("#F7F4EB", "#121316", "#EEF7F4EB")
         }
     }
 
@@ -378,43 +430,51 @@ class ReaderActivity : AppCompatActivity() {
     private fun injectEpubStyles(html: String): String {
         val (bg, text, _) = getThemeColors(displaySettings.theme)
         val fontCss = when (displaySettings.fontFamily) {
-            "sans" -> "font-family: -apple-system, BlinkMacSystemFont, 'Amazon Ember', 'Segoe UI', Roboto, sans-serif;"
-            "mono" -> "font-family: 'SF Mono', Consolas, Menlo, monospace;"
-            else -> "font-family: 'Bookerly', 'Georgia', 'Palatino', 'Times New Roman', serif;"
+            "sans" -> "sans-serif"
+            "mono" -> "monospace"
+            else -> "serif"
         }
 
         val styleTag = """
-            <style>
-                body {
+            <style id="inkwell-dynamic-style">
+                * {
+                    box-sizing: border-box !important;
+                }
+                html, body {
                     background-color: $bg !important;
                     color: $text !important;
-                    $fontCss
-                    font-size: ${displaySettings.fontSize}px !important;
-                    line-height: ${displaySettings.lineSpacing} !important;
-                    padding: 72px ${displaySettings.margin}px 120px ${displaySettings.margin}px !important;
                     margin: 0 !important;
+                    padding: 0 !important;
                     word-break: break-word !important;
-                    box-sizing: border-box !important;
                     text-rendering: optimizeLegibility !important;
                     -webkit-font-smoothing: antialiased !important;
-                    letter-spacing: 0.015em !important;
                 }
-                p {
-                    margin-bottom: 1em !important;
-                    color: $text !important;
+                body {
+                    padding-left: ${displaySettings.margin}px !important;
+                    padding-right: ${displaySettings.margin}px !important;
+                    padding-top: 56px !important;
+                    padding-bottom: 100px !important;
+                }
+                body, p, div, span, h1, h2, h3, h4, h5, h6, li, blockquote, a, td, th {
+                    font-family: $fontCss !important;
                     font-size: ${displaySettings.fontSize}px !important;
                     line-height: ${displaySettings.lineSpacing} !important;
-                }
-                h1, h2, h3, h4, h5, h6 {
                     color: $text !important;
                 }
-                a { color: #F59E0B !important; }
-                img { max-width: 100% !important; height: auto !important; display: block; margin: 12px auto !important; }
-                image { max-width: 100% !important; height: auto !important; }
-                svg { max-width: 100% !important; height: auto !important; }
+                h1, h2, h3, h4, h5, h6 {
+                    margin-top: 1.2em !important;
+                    margin-bottom: 0.6em !important;
+                    font-weight: bold !important;
+                }
+                p {
+                    margin-top: 0 !important;
+                    margin-bottom: 1em !important;
+                }
+                a { color: #1A73E8 !important; }
+                img, image, svg { max-width: 100% !important; height: auto !important; display: block; margin: 12px auto !important; }
                 .inkwell-footer-nav {
-                    margin-top: 50px;
-                    padding: 24px 0 40px 0;
+                    margin-top: 40px;
+                    padding: 20px 0 40px 0;
                     display: flex;
                     justify-content: space-between;
                     gap: 12px;
@@ -432,8 +492,8 @@ class ReaderActivity : AppCompatActivity() {
                     cursor: pointer;
                 }
                 .inkwell-nav-next {
-                    background: #F59E0B !important;
-                    color: #0F1115 !important;
+                    background: #1A73E8 !important;
+                    color: #FFFFFF !important;
                     border: none !important;
                 }
             </style>
@@ -596,14 +656,16 @@ class ReaderActivity : AppCompatActivity() {
     }
 
     private fun styleTextView() {
-        val (_, text, _) = getThemeColors(displaySettings.theme)
+        val (bg, text, _) = getThemeColors(displaySettings.theme)
+        binding.layoutReaderRoot.setBackgroundColor(Color.parseColor(bg))
+        binding.svTextContent.setBackgroundColor(Color.parseColor(bg))
         binding.tvTextBookContent.setTextColor(Color.parseColor(text))
         binding.tvTextBookContent.textSize = displaySettings.fontSize.toFloat()
         binding.tvTextBookContent.setLineSpacing(0f, displaySettings.lineSpacing)
         binding.tvTextBookContent.setPadding(
-            displaySettings.margin * 2,
-            32,
-            displaySettings.margin * 2,
+            displaySettings.margin,
+            56,
+            displaySettings.margin,
             120
         )
 
@@ -806,20 +868,58 @@ class ReaderActivity : AppCompatActivity() {
         val sBinding = BottomSheetDisplayBinding.inflate(layoutInflater)
         sheet.setContentView(sBinding.root)
 
-        // Setup theme buttons
+        // Setup theme buttons (Strictly 4 presets)
         val themeButtons = listOf(
             sBinding.btnThemePaperwhite to "paperwhite",
-            sBinding.btnThemeWarmLight to "warm_light",
-            sBinding.btnThemeSepia to "sepia",
             sBinding.btnThemeSand to "sand",
             sBinding.btnThemeCharcoal to "charcoal",
             sBinding.btnThemeOled to "oled"
         )
 
+        fun updateControlSelectionUi() {
+            val activeBg = getColor(R.color.brand_primary_container)
+            val activeText = getColor(R.color.brand_on_primary_container)
+            val inactiveBg = getColor(R.color.app_surface_variant)
+            val inactiveText = getColor(R.color.text_secondary)
+
+            // Typeface
+            sBinding.btnFontSerif.setBackgroundColor(if (displaySettings.fontFamily == "serif") activeBg else inactiveBg)
+            sBinding.btnFontSerif.setTextColor(if (displaySettings.fontFamily == "serif") activeText else inactiveText)
+            sBinding.btnFontSans.setBackgroundColor(if (displaySettings.fontFamily == "sans") activeBg else inactiveBg)
+            sBinding.btnFontSans.setTextColor(if (displaySettings.fontFamily == "sans") activeText else inactiveText)
+            sBinding.btnFontMono.setBackgroundColor(if (displaySettings.fontFamily == "mono") activeBg else inactiveBg)
+            sBinding.btnFontMono.setTextColor(if (displaySettings.fontFamily == "mono") activeText else inactiveText)
+
+            // Line Spacing
+            sBinding.btnLineSpacingCompact.setBackgroundColor(if (displaySettings.lineSpacing == 1.3f) activeBg else inactiveBg)
+            sBinding.btnLineSpacingCompact.setTextColor(if (displaySettings.lineSpacing == 1.3f) activeText else inactiveText)
+            sBinding.btnLineSpacingNormal.setBackgroundColor(if (displaySettings.lineSpacing == 1.6f) activeBg else inactiveBg)
+            sBinding.btnLineSpacingNormal.setTextColor(if (displaySettings.lineSpacing == 1.6f) activeText else inactiveText)
+            sBinding.btnLineSpacingRelaxed.setBackgroundColor(if (displaySettings.lineSpacing == 2.0f) activeBg else inactiveBg)
+            sBinding.btnLineSpacingRelaxed.setTextColor(if (displaySettings.lineSpacing == 2.0f) activeText else inactiveText)
+
+            // Margins
+            sBinding.btnMarginNarrow.setBackgroundColor(if (displaySettings.margin <= 14) activeBg else inactiveBg)
+            sBinding.btnMarginNarrow.setTextColor(if (displaySettings.margin <= 14) activeText else inactiveText)
+            sBinding.btnMarginNormal.setBackgroundColor(if (displaySettings.margin in 15..28) activeBg else inactiveBg)
+            sBinding.btnMarginNormal.setTextColor(if (displaySettings.margin in 15..28) activeText else inactiveText)
+            sBinding.btnMarginWide.setBackgroundColor(if (displaySettings.margin > 28) activeBg else inactiveBg)
+            sBinding.btnMarginWide.setTextColor(if (displaySettings.margin > 28) activeText else inactiveText)
+
+            // Theme selection strokes
+            val activeStroke = (resources.displayMetrics.density * 2.5f).toInt()
+            val inactiveStroke = (resources.displayMetrics.density * 1f).toInt()
+            sBinding.btnThemePaperwhite.strokeWidth = if (displaySettings.theme == "paperwhite") activeStroke else inactiveStroke
+            sBinding.btnThemeSand.strokeWidth = if (displaySettings.theme == "sand") activeStroke else inactiveStroke
+            sBinding.btnThemeCharcoal.strokeWidth = if (displaySettings.theme == "charcoal") activeStroke else inactiveStroke
+            sBinding.btnThemeOled.strokeWidth = if (displaySettings.theme == "oled") activeStroke else inactiveStroke
+        }
+
         themeButtons.forEach { (btn, theme) ->
             btn.setOnClickListener {
                 displaySettings.theme = theme
                 repository.saveDisplaySettings(displaySettings)
+                updateControlSelectionUi()
                 applyDisplaySettings()
             }
         }
@@ -831,21 +931,6 @@ class ReaderActivity : AppCompatActivity() {
             repository.saveDisplaySettings(displaySettings)
             applyDisplaySettings()
         }
-
-        sBinding.tvWarmthPercent.text = "${displaySettings.einkWarmthPercent}%"
-        sBinding.sbScreenWarmth.progress = displaySettings.einkWarmthPercent
-        sBinding.sbScreenWarmth.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    displaySettings.einkWarmthPercent = progress
-                    sBinding.tvWarmthPercent.text = "$progress%"
-                    repository.saveDisplaySettings(displaySettings)
-                    applyDisplaySettings()
-                }
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
 
         sBinding.switchEinkFlash.isChecked = displaySettings.einkPageRefreshFlash
         sBinding.switchEinkFlash.setOnCheckedChangeListener { _, isChecked ->
@@ -861,14 +946,14 @@ class ReaderActivity : AppCompatActivity() {
         if (isPdf) {
             sBinding.btnPdfFitWidth.setOnClickListener {
                 binding.ivPdfPage.setFitWidthMode(true)
-                sBinding.btnPdfFitWidth.setTextColor(Color.parseColor("#F59E0B"))
+                sBinding.btnPdfFitWidth.setTextColor(getColor(R.color.brand_primary))
                 sBinding.btnPdfFitPage.setTextColor(Color.WHITE)
                 Toast.makeText(this, "Fit Width enabled (no side gaps)", Toast.LENGTH_SHORT).show()
             }
 
             sBinding.btnPdfFitPage.setOnClickListener {
                 binding.ivPdfPage.setFitWidthMode(false)
-                sBinding.btnPdfFitPage.setTextColor(Color.parseColor("#F59E0B"))
+                sBinding.btnPdfFitPage.setTextColor(getColor(R.color.brand_primary))
                 sBinding.btnPdfFitWidth.setTextColor(Color.WHITE)
                 Toast.makeText(this, "Fit Entire Page enabled", Toast.LENGTH_SHORT).show()
             }
@@ -927,16 +1012,19 @@ class ReaderActivity : AppCompatActivity() {
         sBinding.btnFontSerif.setOnClickListener {
             displaySettings.fontFamily = "serif"
             repository.saveDisplaySettings(displaySettings)
+            updateControlSelectionUi()
             applyDisplaySettings()
         }
         sBinding.btnFontSans.setOnClickListener {
             displaySettings.fontFamily = "sans"
             repository.saveDisplaySettings(displaySettings)
+            updateControlSelectionUi()
             applyDisplaySettings()
         }
         sBinding.btnFontMono.setOnClickListener {
             displaySettings.fontFamily = "mono"
             repository.saveDisplaySettings(displaySettings)
+            updateControlSelectionUi()
             applyDisplaySettings()
         }
 
@@ -944,16 +1032,19 @@ class ReaderActivity : AppCompatActivity() {
         sBinding.btnLineSpacingCompact.setOnClickListener {
             displaySettings.lineSpacing = 1.3f
             repository.saveDisplaySettings(displaySettings)
+            updateControlSelectionUi()
             applyDisplaySettings()
         }
         sBinding.btnLineSpacingNormal.setOnClickListener {
             displaySettings.lineSpacing = 1.6f
             repository.saveDisplaySettings(displaySettings)
+            updateControlSelectionUi()
             applyDisplaySettings()
         }
         sBinding.btnLineSpacingRelaxed.setOnClickListener {
             displaySettings.lineSpacing = 2.0f
             repository.saveDisplaySettings(displaySettings)
+            updateControlSelectionUi()
             applyDisplaySettings()
         }
 
@@ -961,18 +1052,24 @@ class ReaderActivity : AppCompatActivity() {
         sBinding.btnMarginNarrow.setOnClickListener {
             displaySettings.margin = 12
             repository.saveDisplaySettings(displaySettings)
+            updateControlSelectionUi()
             applyDisplaySettings()
         }
         sBinding.btnMarginNormal.setOnClickListener {
             displaySettings.margin = 20
             repository.saveDisplaySettings(displaySettings)
+            updateControlSelectionUi()
             applyDisplaySettings()
         }
         sBinding.btnMarginWide.setOnClickListener {
-            displaySettings.margin = 32
+            displaySettings.margin = 36
             repository.saveDisplaySettings(displaySettings)
+            updateControlSelectionUi()
             applyDisplaySettings()
         }
+
+        // Initialize button selection UI state
+        updateControlSelectionUi()
 
         // Night dimmer
         sBinding.tvDimmerPercent.text = "${displaySettings.dimmerPercent}%"

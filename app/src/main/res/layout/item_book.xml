@@ -67,7 +67,7 @@
                     android:layout_width="24dp"
                     android:layout_height="2dp"
                     android:layout_marginVertical="8dp"
-                    android:background="@color/amber_400" />
+                    android:background="@color/brand_primary" />
 
                 <TextView
                     android:id="@+id/tvTypoAuthor"
@@ -92,7 +92,7 @@
                 android:paddingHorizontal="6dp"
                 android:paddingVertical="2dp"
                 android:text="EPUB"
-                android:textColor="@color/amber_400"
+                android:textColor="@color/brand_primary"
                 android:textSize="9sp"
                 android:textStyle="bold" />
 

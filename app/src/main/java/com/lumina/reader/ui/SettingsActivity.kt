@@ -2,10 +2,11 @@ package com.lumina.reader.ui
 
 import android.os.Bundle
 import android.widget.EditText
-import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import com.lumina.reader.R
 import com.lumina.reader.data.model.DisplaySettings
 import com.lumina.reader.data.storage.BookRepository
 import com.lumina.reader.databinding.ActivitySettingsBinding
@@ -34,6 +35,19 @@ class SettingsActivity : AppCompatActivity() {
             finish()
         }
 
+        // App Theme (Light / Dark / System)
+        updateThemeModeButtons(settings.appThemeMode)
+
+        binding.btnThemeSystem.setOnClickListener {
+            setAppThemeMode("system")
+        }
+        binding.btnThemeLight.setOnClickListener {
+            setAppThemeMode("light")
+        }
+        binding.btnThemeDark.setOnClickListener {
+            setAppThemeMode("dark")
+        }
+
         // Reader Name
         binding.tvCurrentReaderName.text = settings.readerName
         binding.btnEditReaderName.setOnClickListener {
@@ -46,21 +60,6 @@ class SettingsActivity : AppCompatActivity() {
             settings.einkMatteOverlay = isChecked
             repository.saveDisplaySettings(settings)
         }
-
-        // Kindle Warm Frontlight
-        binding.tvSettingsWarmthPercent.text = "${settings.einkWarmthPercent}%"
-        binding.sbSettingsWarmth.progress = settings.einkWarmthPercent
-        binding.sbSettingsWarmth.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    settings.einkWarmthPercent = progress
-                    binding.tvSettingsWarmthPercent.text = "$progress%"
-                    repository.saveDisplaySettings(settings)
-                }
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
 
         // E-Ink Refresh Pulse Flash
         binding.switchSettingsEinkFlash.isChecked = settings.einkPageRefreshFlash
@@ -85,6 +84,37 @@ class SettingsActivity : AppCompatActivity() {
             Toast.makeText(this, "EPUB cache cleared successfully!", Toast.LENGTH_SHORT).show()
             calculateCacheSize()
         }
+    }
+
+    private fun setAppThemeMode(mode: String) {
+        settings.appThemeMode = mode
+        repository.saveDisplaySettings(settings)
+        updateThemeModeButtons(mode)
+
+        when (mode) {
+            "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        }
+    }
+
+    private fun updateThemeModeButtons(activeMode: String) {
+        val activeBg = getColor(R.color.brand_primary_container)
+        val activeText = getColor(R.color.brand_on_primary_container)
+        val inactiveBg = getColor(R.color.transparent)
+        val inactiveText = getColor(R.color.text_secondary)
+
+        // System
+        binding.btnThemeSystem.setBackgroundColor(if (activeMode == "system") activeBg else inactiveBg)
+        binding.btnThemeSystem.setTextColor(if (activeMode == "system") activeText else inactiveText)
+
+        // Light
+        binding.btnThemeLight.setBackgroundColor(if (activeMode == "light") activeBg else inactiveBg)
+        binding.btnThemeLight.setTextColor(if (activeMode == "light") activeText else inactiveText)
+
+        // Dark
+        binding.btnThemeDark.setBackgroundColor(if (activeMode == "dark") activeBg else inactiveBg)
+        binding.btnThemeDark.setTextColor(if (activeMode == "dark") activeText else inactiveText)
     }
 
     private fun showEditReaderNameDialog() {
