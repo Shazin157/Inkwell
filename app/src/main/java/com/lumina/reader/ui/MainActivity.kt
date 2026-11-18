@@ -14,10 +14,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lumina.reader.R
 import com.lumina.reader.data.model.Book
 import com.lumina.reader.data.storage.BookRepository
 import com.lumina.reader.databinding.ActivityMainBinding
+import com.lumina.reader.databinding.DialogRemoveHeroBinding
+import com.lumina.reader.databinding.DialogSupportedFormatsBinding
 import com.lumina.reader.ui.adapter.BookAdapter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -285,41 +289,43 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showRemoveHeroOptionsDialog(book: Book) {
-        val options = arrayOf(
-            "Hide 'Jump Back In' from Home Screen",
-            "Remove '${book.title}' from Jump Back In"
-        )
+        val bottomSheet = BottomSheetDialog(this)
+        val sheetBinding = DialogRemoveHeroBinding.inflate(layoutInflater)
+        bottomSheet.setContentView(sheetBinding.root)
 
-        AlertDialog.Builder(this)
-            .setTitle("Remove Jump Back In")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> {
-                        val settings = repository.loadDisplaySettings()
-                        settings.showJumpBackInWidget = false
-                        repository.saveDisplaySettings(settings)
-                        binding.cardContinueReading.visibility = View.GONE
-                        com.google.android.material.snackbar.Snackbar.make(
-                            binding.root,
-                            "Jump Back In widget hidden (re-enable in Settings)",
-                            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
-                        ).setAction("UNDO") {
-                            settings.showJumpBackInWidget = true
-                            repository.saveDisplaySettings(settings)
-                            updateHeroCard()
-                        }.show()
-                    }
-                    1 -> {
-                        book.progress = 0f
-                        book.currentLocation = null
-                        repository.updateBook(book)
-                        loadBooks()
-                        Toast.makeText(this, "'${book.title}' removed from Jump Back In", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
+        sheetBinding.tvClearBookDesc.text = "Clears reading progress for \"${book.title}\" so it no longer appears in the banner."
+
+        sheetBinding.rowHideWidget.setOnClickListener {
+            bottomSheet.dismiss()
+            val settings = repository.loadDisplaySettings()
+            settings.showJumpBackInWidget = false
+            repository.saveDisplaySettings(settings)
+            binding.cardContinueReading.visibility = View.GONE
+            com.google.android.material.snackbar.Snackbar.make(
+                binding.root,
+                "Jump Back In widget hidden (re-enable in Settings)",
+                com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+            ).setAction("UNDO") {
+                settings.showJumpBackInWidget = true
+                repository.saveDisplaySettings(settings)
+                updateHeroCard()
+            }.show()
+        }
+
+        sheetBinding.rowClearBook.setOnClickListener {
+            bottomSheet.dismiss()
+            book.progress = 0f
+            book.currentLocation = null
+            repository.updateBook(book)
+            loadBooks()
+            Toast.makeText(this, "'${book.title}' removed from Jump Back In", Toast.LENGTH_SHORT).show()
+        }
+
+        sheetBinding.btnCancelRemoveHero.setOnClickListener {
+            bottomSheet.dismiss()
+        }
+
+        bottomSheet.show()
     }
 
     private fun importBookUri(uri: Uri) {
@@ -370,7 +376,7 @@ class MainActivity : AppCompatActivity() {
         val sizeKb = book.fileSize / 1024
         val sizeStr = if (sizeKb > 1024) "${String.format("%.1f", sizeKb / 1024f)} MB" else "$sizeKb KB"
 
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle(book.title)
             .setMessage(
                 "Author: ${book.author}\n" +
@@ -390,7 +396,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun confirmDeleteBook(book: Book) {
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle("Remove Book")
             .setMessage("Are you sure you want to remove '${book.title}' from your library?")
             .setPositiveButton("Remove") { _, _ ->
@@ -407,19 +413,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showSupportedFormatsDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Supported Book Formats")
-            .setMessage(
-                "Inkwell supports the following file formats:\n\n" +
-                "📖  EPUB (.epub)\nStandard electronic books with reflowable text, chapters, embedded images, and custom font sizing.\n\n" +
-                "📄  PDF (.pdf)\nFixed-layout documents and books with Fit Width (0 side gaps), Whole Screen Fill, pinch zoom, and e-ink contrast tuning.\n\n" +
-                "📝  Text (.txt, .md)\nPlain text and Markdown notes or books.\n\n" +
-                "Tip: You can import files via the '+' button, or open/share them directly from your Downloads folder or Files app into Inkwell."
-            )
-            .setPositiveButton("Import Book") { _, _ ->
-                binding.fabUpload.performClick()
-            }
-            .setNegativeButton("Close", null)
-            .show()
+        val bottomSheet = BottomSheetDialog(this)
+        val sheetBinding = DialogSupportedFormatsBinding.inflate(layoutInflater)
+        bottomSheet.setContentView(sheetBinding.root)
+
+        sheetBinding.btnImportFromFormats.setOnClickListener {
+            bottomSheet.dismiss()
+            binding.fabUpload.performClick()
+        }
+
+        bottomSheet.show()
     }
 }

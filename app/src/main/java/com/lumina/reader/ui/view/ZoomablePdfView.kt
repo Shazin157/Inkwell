@@ -26,9 +26,9 @@ class ZoomablePdfView @JvmOverloads constructor(
     private val maxScale = 5.0f
 
     enum class PdfFitMode {
-        FIT_WIDTH,  // 100% width edge-to-edge, zero side gaps, scrolls vertically from top
-        FIT_PAGE,   // Entire page fit inside view (proportional)
-        FIT_SCREEN  // Edge-to-edge full screen fill
+        FIT_WIDTH,  // 100% width edge-to-edge (0 side gaps), centered vertically if shorter
+        FIT_SCREEN, // Whole screen fill (zero gaps anywhere on display)
+        FIT_PAGE    // Entire page fit inside view (proportional letterboxed)
     }
 
     var fitMode: PdfFitMode = PdfFitMode.FIT_WIDTH
@@ -62,7 +62,6 @@ class ZoomablePdfView @JvmOverloads constructor(
 
         gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onDown(e: MotionEvent): Boolean {
-                // Must return true so Android sends all subsequent MOVE and UP gestures to this view
                 return true
             }
 
@@ -75,7 +74,7 @@ class ZoomablePdfView @JvmOverloads constructor(
                 if (currentScale > 1.25f) {
                     resetZoom()
                 } else {
-                    val targetScale = 2.2f
+                    val targetScale = 2.0f
                     val factor = targetScale / currentScale
                     currentScale = targetScale
                     imageMatrixInternal.postScale(factor, factor, e.x, e.y)
@@ -91,7 +90,7 @@ class ZoomablePdfView @JvmOverloads constructor(
                 distanceX: Float,
                 distanceY: Float
             ): Boolean {
-                if (scaleDetector.isInProgress) return false
+                if (scaleDetector.isInProgress || e2.pointerCount > 1) return false
                 imageMatrixInternal.postTranslate(-distanceX, -distanceY)
                 checkMatrixBounds()
                 imageMatrix = imageMatrixInternal
@@ -104,12 +103,12 @@ class ZoomablePdfView @JvmOverloads constructor(
                 velocityX: Float,
                 velocityY: Float
             ): Boolean {
-                if (scaleDetector.isInProgress) return false
-                // If not deeply zoomed in, allow left/right swipe to flip pages
-                if (currentScale <= 1.2f && e1 != null) {
+                if (scaleDetector.isInProgress || e2.pointerCount > 1) return false
+                // Only flip page when not zoomed in, and swipe is deliberately horizontal
+                if (currentScale <= 1.08f && e1 != null) {
                     val diffX = e2.x - e1.x
                     val diffY = e2.y - e1.y
-                    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 100 && Math.abs(velocityX) > 200) {
+                    if (Math.abs(diffX) > Math.abs(diffY) * 1.8f && Math.abs(diffX) > 150 && Math.abs(velocityX) > 400) {
                         if (diffX < 0) {
                             onPageSwipeListener?.invoke(1) // Next page
                         } else {
@@ -149,7 +148,7 @@ class ZoomablePdfView @JvmOverloads constructor(
     }
 
     fun zoomIn() {
-        val targetScale = (currentScale * 1.35f).coerceAtMost(maxScale)
+        val targetScale = (currentScale * 1.25f).coerceAtMost(maxScale)
         val factor = targetScale / currentScale
         currentScale = targetScale
         imageMatrixInternal.postScale(factor, factor, width / 2f, height / 2f)
@@ -158,7 +157,7 @@ class ZoomablePdfView @JvmOverloads constructor(
     }
 
     fun zoomOut() {
-        val targetScale = (currentScale / 1.35f).coerceAtLeast(minScale)
+        val targetScale = (currentScale / 1.25f).coerceAtLeast(minScale)
         val factor = targetScale / currentScale
         currentScale = targetScale
         imageMatrixInternal.postScale(factor, factor, width / 2f, height / 2f)
@@ -184,14 +183,17 @@ class ZoomablePdfView @JvmOverloads constructor(
 
         when (fitMode) {
             PdfFitMode.FIT_WIDTH -> {
-                // Width fits screen width (0 side gaps, aligned flush to top)
+                // Width fits 100% of view width (0 side gaps)
                 val scale = viewW / bmpW
                 imageMatrixInternal.postScale(scale, scale)
-                imageMatrixInternal.postTranslate(0f, 0f)
+                val scaledH = bmpH * scale
+                // If shorter than screen, center vertically with balanced margins; if taller, start at top
+                val dy = if (scaledH < viewH) (viewH - scaledH) / 2f else 0f
+                imageMatrixInternal.postTranslate(0f, dy)
             }
-            PdfFitMode.FIT_PAGE -> {
-                // Fit entire page inside the display bounds (proportional letterboxed)
-                val scale = Math.min(viewW / bmpW, viewH / bmpH)
+            PdfFitMode.FIT_SCREEN -> {
+                // Whole screen fill (zero gaps anywhere on display)
+                val scale = Math.max(viewW / bmpW, viewH / bmpH)
                 imageMatrixInternal.postScale(scale, scale)
                 val scaledW = bmpW * scale
                 val scaledH = bmpH * scale
@@ -199,9 +201,9 @@ class ZoomablePdfView @JvmOverloads constructor(
                 val dy = (viewH - scaledH) / 2f
                 imageMatrixInternal.postTranslate(dx, dy)
             }
-            PdfFitMode.FIT_SCREEN -> {
-                // Whole screen fill (0 gaps anywhere)
-                val scale = Math.max(viewW / bmpW, viewH / bmpH)
+            PdfFitMode.FIT_PAGE -> {
+                // Entire page fit inside display bounds (proportional letterboxed)
+                val scale = Math.min(viewW / bmpW, viewH / bmpH)
                 imageMatrixInternal.postScale(scale, scale)
                 val scaledW = bmpW * scale
                 val scaledH = bmpH * scale
@@ -241,11 +243,7 @@ class ZoomablePdfView @JvmOverloads constructor(
 
         // Vertical constraints
         if (rect.height() <= viewH) {
-            if (fitMode == PdfFitMode.FIT_WIDTH) {
-                deltaY = -rect.top // Align flush to top
-            } else {
-                deltaY = (viewH - rect.height()) / 2f - rect.top
-            }
+            deltaY = (viewH - rect.height()) / 2f - rect.top
         } else {
             if (rect.top > 0f) {
                 deltaY = -rect.top

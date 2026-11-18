@@ -1,5 +1,6 @@
 package com.lumina.reader.ui
 
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.ColorMatrix
@@ -587,11 +588,12 @@ class ReaderActivity : AppCompatActivity() {
             val page = renderer.openPage(pageIndex)
             val displayMetrics = resources.displayMetrics
             val screenWidth = displayMetrics.widthPixels
-            // Scale up to crisp high-DPI resolution for phone display
-            val targetWidth = (screenWidth * 1.5f).toInt().coerceAtLeast(1080)
+            // Crisp 2x high-DPI rendering for phones
+            val targetWidth = (screenWidth * 2f).toInt().coerceAtLeast(1080)
             val aspectRatio = page.height.toFloat() / page.width.toFloat()
             val targetHeight = (targetWidth * aspectRatio).toInt()
             val bitmap = Bitmap.createBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888)
+            bitmap.eraseColor(Color.WHITE)
             page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
             page.close()
 
@@ -979,22 +981,22 @@ class ReaderActivity : AppCompatActivity() {
 
         if (isPdf) {
             fun updatePdfModeButtons() {
-                val activeBg = getColor(R.color.brand_primary)
+                val activeBg = ColorStateList.valueOf(getColor(R.color.brand_primary))
                 val activeText = getColor(R.color.brand_on_primary)
-                val inactiveBg = getColor(R.color.app_surface_variant)
+                val inactiveBg = ColorStateList.valueOf(getColor(R.color.app_surface_variant))
                 val inactiveText = getColor(R.color.text_secondary)
 
                 val isWidth = binding.ivPdfPage.fitMode == ZoomablePdfView.PdfFitMode.FIT_WIDTH
                 val isScreen = binding.ivPdfPage.fitMode == ZoomablePdfView.PdfFitMode.FIT_SCREEN
                 val isPage = binding.ivPdfPage.fitMode == ZoomablePdfView.PdfFitMode.FIT_PAGE
 
-                sBinding.btnPdfFitWidth.setBackgroundColor(if (isWidth) activeBg else inactiveBg)
+                sBinding.btnPdfFitWidth.backgroundTintList = if (isWidth) activeBg else inactiveBg
                 sBinding.btnPdfFitWidth.setTextColor(if (isWidth) activeText else inactiveText)
 
-                sBinding.btnPdfFitScreen.setBackgroundColor(if (isScreen) activeBg else inactiveBg)
+                sBinding.btnPdfFitScreen.backgroundTintList = if (isScreen) activeBg else inactiveBg
                 sBinding.btnPdfFitScreen.setTextColor(if (isScreen) activeText else inactiveText)
 
-                sBinding.btnPdfFitPage.setBackgroundColor(if (isPage) activeBg else inactiveBg)
+                sBinding.btnPdfFitPage.backgroundTintList = if (isPage) activeBg else inactiveBg
                 sBinding.btnPdfFitPage.setTextColor(if (isPage) activeText else inactiveText)
             }
 
