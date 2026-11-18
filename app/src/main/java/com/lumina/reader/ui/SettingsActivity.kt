@@ -68,6 +68,13 @@ class SettingsActivity : AppCompatActivity() {
             repository.saveDisplaySettings(settings)
         }
 
+        // Jump Back In Home Widget Toggle
+        binding.switchSettingsJumpBackIn.isChecked = settings.showJumpBackInWidget
+        binding.switchSettingsJumpBackIn.setOnCheckedChangeListener { _, isChecked ->
+            settings.showJumpBackInWidget = isChecked
+            repository.saveDisplaySettings(settings)
+        }
+
         // Keep Screen Awake
         binding.switchSettingsKeepAwake.isChecked = settings.keepScreenAwake
         binding.switchSettingsKeepAwake.setOnCheckedChangeListener { _, isChecked ->

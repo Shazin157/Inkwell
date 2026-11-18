@@ -237,6 +237,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateHeroCard() {
+        val settings = repository.loadDisplaySettings()
+        if (!settings.showJumpBackInWidget) {
+            binding.cardContinueReading.visibility = View.GONE
+            return
+        }
+
         val continueBook = allBooks.filter { it.progress > 0 }.maxByOrNull { it.lastReadAt }
             ?: allBooks.firstOrNull { it.progress > 0 }
 
@@ -269,9 +275,51 @@ class MainActivity : AppCompatActivity() {
             }
             binding.btnResumeReading.setOnClickListener { openBookAction() }
             binding.cardContinueReading.setOnClickListener { openBookAction() }
+
+            binding.btnRemoveHero.setOnClickListener {
+                showRemoveHeroOptionsDialog(continueBook)
+            }
         } else {
             binding.cardContinueReading.visibility = View.GONE
         }
+    }
+
+    private fun showRemoveHeroOptionsDialog(book: Book) {
+        val options = arrayOf(
+            "Hide 'Jump Back In' from Home Screen",
+            "Remove '${book.title}' from Jump Back In"
+        )
+
+        AlertDialog.Builder(this)
+            .setTitle("Remove Jump Back In")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> {
+                        val settings = repository.loadDisplaySettings()
+                        settings.showJumpBackInWidget = false
+                        repository.saveDisplaySettings(settings)
+                        binding.cardContinueReading.visibility = View.GONE
+                        com.google.android.material.snackbar.Snackbar.make(
+                            binding.root,
+                            "Jump Back In widget hidden (re-enable in Settings)",
+                            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+                        ).setAction("UNDO") {
+                            settings.showJumpBackInWidget = true
+                            repository.saveDisplaySettings(settings)
+                            updateHeroCard()
+                        }.show()
+                    }
+                    1 -> {
+                        book.progress = 0f
+                        book.currentLocation = null
+                        repository.updateBook(book)
+                        loadBooks()
+                        Toast.makeText(this, "'${book.title}' removed from Jump Back In", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun importBookUri(uri: Uri) {
