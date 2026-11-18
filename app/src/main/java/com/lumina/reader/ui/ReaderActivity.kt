@@ -560,8 +560,8 @@ class ReaderActivity : AppCompatActivity() {
 
         binding.ivPdfPage.fitMode = when (displaySettings.pdfFitMode) {
             "page" -> ZoomablePdfView.PdfFitMode.FIT_PAGE
-            "screen" -> ZoomablePdfView.PdfFitMode.FIT_SCREEN
-            else -> ZoomablePdfView.PdfFitMode.FIT_WIDTH
+            "width" -> ZoomablePdfView.PdfFitMode.FIT_WIDTH
+            else -> ZoomablePdfView.PdfFitMode.FIT_SCREEN
         }
 
         try {

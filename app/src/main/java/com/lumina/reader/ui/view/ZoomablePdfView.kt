@@ -31,7 +31,7 @@ class ZoomablePdfView @JvmOverloads constructor(
         FIT_PAGE    // Entire page fit inside view (proportional letterboxed)
     }
 
-    var fitMode: PdfFitMode = PdfFitMode.FIT_WIDTH
+    var fitMode: PdfFitMode = PdfFitMode.FIT_SCREEN
 
     private var currentBitmap: Bitmap? = null
 
@@ -243,7 +243,12 @@ class ZoomablePdfView @JvmOverloads constructor(
 
         // Vertical constraints
         if (rect.height() <= viewH) {
-            deltaY = (viewH - rect.height()) / 2f - rect.top
+            // If page is smaller than view height, allow fluid scrolling between top and bottom edges without snapping
+            if (rect.top < 0f) {
+                deltaY = -rect.top
+            } else if (rect.bottom > viewH) {
+                deltaY = viewH - rect.bottom
+            }
         } else {
             if (rect.top > 0f) {
                 deltaY = -rect.top
