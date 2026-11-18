@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Google Expressive Brand & Accent (Dark Mode) -->
-    <color name="brand_primary">#8AB4F8</color>
-    <color name="brand_primary_variant">#669DF6</color>
-    <color name="brand_primary_container">#1E3A5F</color>
-    <color name="brand_on_primary">#0F172A</color>
-    <color name="brand_on_primary_container">#D2E3FC</color>
-    <color name="brand_accent">#8AB4F8</color>
+    <!-- Theme 2: E-Paper Charcoal & Mist (Dark Mode - Kindle Matte Dark Carbon) -->
+    <color name="brand_primary">#F3F4F6</color>
+    <color name="brand_primary_variant">#E5E7EB</color>
+    <color name="brand_primary_container">#2B2F3A</color>
+    <color name="brand_on_primary">#111827</color>
+    <color name="brand_on_primary_container">#F9FAFB</color>
+    <color name="brand_accent">#D1D5DB</color>
 
     <!-- App Surface & Canvas Colors (Dark Mode) -->
     <color name="app_bg">#121316</color>
-    <color name="app_surface">#1A1D24</color>
-    <color name="app_surface_variant">#232732</color>
-    <color name="app_surface_card">#1E222C</color>
-    <color name="app_border">#2E3341</color>
-    <color name="text_primary">#F8FAFC</color>
-    <color name="text_secondary">#94A3B8</color>
-    <color name="text_tertiary">#64748B</color>
+    <color name="app_surface">#1A1C22</color>
+    <color name="app_surface_variant">#242730</color>
+    <color name="app_surface_card">#1C1E25</color>
+    <color name="app_border">#2F333E</color>
+    <color name="text_primary">#F9FAFB</color>
+    <color name="text_secondary">#9CA3AF</color>
+    <color name="text_tertiary">#6B7280</color>
 
     <!-- Reading Mode Presets (Unchanged across UI themes) -->
     <color name="reader_paperwhite_bg">#F7F4EB</color>
@@ -40,17 +40,17 @@
     <color name="reader_oled_border">#27272A</color>
 
     <!-- Format Badges -->
-    <color name="badge_epub_bg">#1E3A5F</color>
-    <color name="badge_epub_text">#8AB4F8</color>
-    <color name="badge_pdf_bg">#3C1E22</color>
-    <color name="badge_pdf_text">#F28B82</color>
-    <color name="badge_txt_bg">#173824</color>
-    <color name="badge_txt_text">#81C995</color>
+    <color name="badge_epub_bg">#282C37</color>
+    <color name="badge_epub_text">#F3F4F6</color>
+    <color name="badge_pdf_bg">#282C37</color>
+    <color name="badge_pdf_text">#E5E7EB</color>
+    <color name="badge_txt_bg">#21232B</color>
+    <color name="badge_txt_text">#9CA3AF</color>
 
     <!-- Aliases for backwards compatibility -->
-    <color name="amber_400">#8AB4F8</color>
-    <color name="amber_500">#8AB4F8</color>
-    <color name="amber_600">#669DF6</color>
+    <color name="amber_400">#F3F4F6</color>
+    <color name="amber_500">#F3F4F6</color>
+    <color name="amber_600">#E5E7EB</color>
 
     <!-- Common -->
     <color name="black">#000000</color>

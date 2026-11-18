@@ -4,13 +4,35 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
     <group
-        android:scaleX="1.8"
-        android:scaleY="1.8"
-        android:translateX="32.4"
-        android:translateY="32.4">
-        <!-- Open Book Silhouette -->
+        android:scaleX="1.35"
+        android:scaleY="1.35"
+        android:translateX="21.6"
+        android:translateY="21.6">
+        <!-- Outer E-Reader / Book Frame -->
         <path
-            android:fillColor="#F59E0B"
-            android:pathData="M2,4v16c0,0.55 0.45,1 1,1h18c0.55,0 1,-0.45 1,-1V4c0,-0.55 -0.45,-1 -1,-1H3C2.45,3 2,3.45 2,4zM12,4.5c1.5,-1 3.5,-1 5.5,-1c1.5,0 3,0.5 3.5,1v13.5c-0.5,-0.5 -2,-1 -3.5,-1c-2,0 -4,0 -5.5,1V4.5zM3,4.5c0.5,-0.5 2,-1 3.5,-1c2,0 4,0 5.5,1V17c-1.5,-1 -3.5,-1 -5.5,-1c-1.5,0 -3,0.5 -3.5,1V4.5z"/>
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="2.8"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M14,6 h20 c4.4,0 8,3.6 8,8 v20 c0,4.4 -3.6,8 -8,8 H14 c-4.4,0 -8,-3.6 -8,-8 V14 c0,-4.4 3.6,-8 8,-8 Z" />
+
+        <!-- Inner Turning Page Portal -->
+        <path
+            android:strokeColor="#9CA3AF"
+            android:strokeWidth="2.2"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M16,13 h16 c2.2,0 4,1.8 4,4 v14 c0,2.2 -1.8,4 -4,4 H16 c-2.2,0 -4,-1.8 -4,-4 V17 c0,-2.2 1.8,-4 4,-4 Z" />
+
+        <!-- Center Minimal Slit & Nib Bookmark -->
+        <path
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="2"
+            android:strokeLineCap="round"
+            android:pathData="M24,17 v14" />
+
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M24,20 L21.5,24.5 L26.5,24.5 Z" />
     </group>
 </vector>

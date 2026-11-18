@@ -3,5 +3,5 @@
     <solid android:color="@color/app_surface_variant" />
     <stroke
         android:width="2dp"
-        android:color="#33F59E0B" />
+        android:color="@color/app_border" />
 </shape>
