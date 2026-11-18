@@ -144,17 +144,22 @@ class ReaderActivity : AppCompatActivity() {
             }
         })
 
-        // Touch zones
-        binding.touchZoneCenter.setOnClickListener {
-            toggleChrome()
+        // Single tap gesture detector for PDF & Plain Text
+        val singleTapDetector = android.view.GestureDetector(this, object : android.view.GestureDetector.SimpleOnGestureListener() {
+            override fun onSingleTapConfirmed(e: android.view.MotionEvent): Boolean {
+                toggleChrome()
+                return true
+            }
+        })
+
+        binding.ivPdfPage.setOnTouchListener { _, event ->
+            singleTapDetector.onTouchEvent(event)
+            true
         }
 
-        binding.touchZonePrev.setOnClickListener {
-            navigatePrevious()
-        }
-
-        binding.touchZoneNext.setOnClickListener {
-            navigateNext()
+        binding.svTextContent.setOnTouchListener { _, event ->
+            singleTapDetector.onTouchEvent(event)
+            false
         }
     }
 
@@ -196,11 +201,24 @@ class ReaderActivity : AppCompatActivity() {
         }
     }
 
-    private fun toggleChrome() {
+    fun toggleChrome() {
         isChromeVisible = !isChromeVisible
-        val vis = if (isChromeVisible) View.VISIBLE else View.GONE
-        binding.layoutTopBar.visibility = vis
-        binding.layoutBottomBar.visibility = vis
+        val topBar = binding.layoutTopBar
+        val bottomBar = binding.layoutBottomBar
+
+        if (isChromeVisible) {
+            topBar.visibility = View.VISIBLE
+            bottomBar.visibility = View.VISIBLE
+            topBar.animate().translationY(0f).setDuration(220).start()
+            bottomBar.animate().translationY(0f).setDuration(220).start()
+        } else {
+            topBar.animate().translationY(-topBar.height.toFloat()).setDuration(220).withEndAction {
+                topBar.visibility = View.GONE
+            }.start()
+            bottomBar.animate().translationY(bottomBar.height.toFloat()).setDuration(220).withEndAction {
+                bottomBar.visibility = View.GONE
+            }.start()
+        }
     }
 
     private fun openBook() {
@@ -217,6 +235,29 @@ class ReaderActivity : AppCompatActivity() {
     // ----------------------------------------------------
     // EPUB Reader Engine
     // ----------------------------------------------------
+    private class EpubJsBridge(private val activity: ReaderActivity) {
+        @android.webkit.JavascriptInterface
+        fun toggleChrome() {
+            activity.runOnUiThread {
+                activity.toggleChrome()
+            }
+        }
+
+        @android.webkit.JavascriptInterface
+        fun nextChapter() {
+            activity.runOnUiThread {
+                activity.navigateNext()
+            }
+        }
+
+        @android.webkit.JavascriptInterface
+        fun prevChapter() {
+            activity.runOnUiThread {
+                activity.navigatePrevious()
+            }
+        }
+    }
+
     private fun openEpub(book: Book) {
         binding.webViewEpub.visibility = View.VISIBLE
         binding.ivPdfPage.visibility = View.GONE
@@ -233,6 +274,8 @@ class ReaderActivity : AppCompatActivity() {
             allowUniversalAccessFromFileURLs = true
             domStorageEnabled = true
         }
+
+        binding.webViewEpub.addJavascriptInterface(EpubJsBridge(this), "Android")
 
         binding.webViewEpub.webViewClient = object : WebViewClient() {
             override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
@@ -286,6 +329,7 @@ class ReaderActivity : AppCompatActivity() {
             val rawHtml = EpubExtractor.readChapterHtml(meta.unpackedDir, spinePath)
             val styledHtml = injectEpubStyles(rawHtml)
             withContext(Dispatchers.Main) {
+                binding.webViewEpub.scrollTo(0, 0)
                 binding.webViewEpub.loadDataWithBaseURL(baseURL, styledHtml, "text/html", "UTF-8", null)
 
                 val chapterTitle = meta.toc.getOrNull(currentSpineIndex)?.label ?: "Chapter ${currentSpineIndex + 1}"
@@ -320,9 +364,10 @@ class ReaderActivity : AppCompatActivity() {
                     $fontCss
                     font-size: ${displaySettings.fontSize}px !important;
                     line-height: ${displaySettings.lineSpacing} !important;
-                    padding: 16px ${displaySettings.margin}px !important;
+                    padding: 72px ${displaySettings.margin}px 120px ${displaySettings.margin}px !important;
                     margin: 0 !important;
                     word-break: break-word !important;
+                    box-sizing: border-box !important;
                 }
                 p {
                     margin-bottom: 1em !important;
@@ -337,14 +382,77 @@ class ReaderActivity : AppCompatActivity() {
                 img { max-width: 100% !important; height: auto !important; display: block; margin: 12px auto !important; }
                 image { max-width: 100% !important; height: auto !important; }
                 svg { max-width: 100% !important; height: auto !important; }
+                .inkwell-footer-nav {
+                    margin-top: 50px;
+                    padding: 24px 0 40px 0;
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 12px;
+                    border-top: 1px solid rgba(128,128,128,0.25);
+                }
+                .inkwell-nav-btn {
+                    flex: 1;
+                    padding: 14px 8px;
+                    background: rgba(128,128,128,0.15);
+                    color: inherit;
+                    border: 1px solid rgba(128,128,128,0.3);
+                    border-radius: 12px;
+                    font-weight: bold;
+                    font-size: 13px;
+                    cursor: pointer;
+                }
+                .inkwell-nav-next {
+                    background: #F59E0B !important;
+                    color: #0F1115 !important;
+                    border: none !important;
+                }
             </style>
         """.trimIndent()
 
-        return if (html.contains("</head>", ignoreCase = true)) {
+        val footerHtml = """
+            <div class="inkwell-footer-nav">
+                <button class="inkwell-nav-btn" onclick="window.Android && window.Android.prevChapter()">← Previous Chapter</button>
+                <button class="inkwell-nav-btn inkwell-nav-next" onclick="window.Android && window.Android.nextChapter()">Next Chapter →</button>
+            </div>
+            <script>
+                (function() {
+                    let startX = 0, startY = 0, startTime = 0;
+                    document.addEventListener('touchstart', function(e) {
+                        if (e.touches && e.touches.length > 0) {
+                            startX = e.touches[0].clientX;
+                            startY = e.touches[0].clientY;
+                            startTime = Date.now();
+                        }
+                    }, { passive: true });
+                    document.addEventListener('touchend', function(e) {
+                        if (e.changedTouches && e.changedTouches.length > 0) {
+                            const dx = Math.abs(e.changedTouches[0].clientX - startX);
+                            const dy = Math.abs(e.changedTouches[0].clientY - startY);
+                            const dt = Date.now() - startTime;
+                            if (dx < 20 && dy < 20 && dt < 350) {
+                                if (window.Android && window.Android.toggleChrome) {
+                                    window.Android.toggleChrome();
+                                }
+                            }
+                        }
+                    }, { passive: true });
+                })();
+            </script>
+        """.trimIndent()
+
+        var result = if (html.contains("</head>", ignoreCase = true)) {
             html.replace("</head>", "$styleTag</head>")
         } else {
             "<html><head>$styleTag</head><body>$html</body></html>"
         }
+
+        result = if (result.contains("</body>", ignoreCase = true)) {
+            result.replace("</body>", "$footerHtml</body>")
+        } else {
+            "$result$footerHtml"
+        }
+
+        return result
     }
 
     // ----------------------------------------------------
